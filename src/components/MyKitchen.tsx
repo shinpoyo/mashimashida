@@ -77,7 +77,7 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
           </button>
           <button
             type="button"
-            onClick={() => onNavigate('typing-battle')}
+            onClick={() => onNavigate('ticket-vending')}
             className="py-2.5 px-5 bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-xs rounded-xl shadow-hard-sm cursor-pointer flex items-center gap-1.5"
           >
             <span className="material-symbols-outlined text-sm">sports_kabaddi</span>

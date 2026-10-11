@@ -9,6 +9,8 @@ interface TicketVendingProps {
   initialSettings: GameSettings;
   bestScores: UserStats['bestScores'];
   onStartGame: (settings: GameSettings) => void;
+  /** false の間（修行ポップアップ表示中）はキー操作を受け付けない */
+  active: boolean;
 }
 
 const TONE_STYLES = {
@@ -18,7 +20,7 @@ const TONE_STYLES = {
   black: { badge: 'bg-[#93000a] text-[#ffdad6]', name: 'text-[#ffb4ab]', price: 'text-[#ffb4ab]', on: 'border-[#ff5555] shadow-[0_0_12px_rgba(255,85,85,0.4)]', hover: 'hover:border-[#ff5555]', bg: 'bg-[#0e0e0e]' },
 } as const;
 
-export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, bestScores, onStartGame }) => {
+export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, bestScores, onStartGame, active }) => {
   const [selectedMode, setSelectedMode] = useState<GameMode>(initialSettings.mode);
   const [penalty, setPenalty] = useState<PenaltyId>(initialSettings.penalty);
   const [issuedMessage, setIssuedMessage] = useState<string>(`${TICKET_CONFIGS[initialSettings.mode].name} を選択中`);
@@ -44,6 +46,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
 
   // キーボード: 1〜4 で食券選択、Enter で着席
   useEffect(() => {
+    if (!active) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       const idx = ['1', '2', '3', '4'].indexOf(e.key);
@@ -58,7 +61,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedMode, penalty]);
+  }, [selectedMode, penalty, active]);
 
   return (
     <div className="flex flex-col w-full pb-16">

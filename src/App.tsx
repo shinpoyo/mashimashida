@@ -84,9 +84,24 @@ export default function App() {
 
   const handleStartGame = (next: GameSettings) => {
     setSettings(next);
-    setBattleKey((k) => k + 1);
-    setCurrentScreen('typing-battle');
+    openBattle();
   };
+
+  /** タイピング修行はポップアップで開く（食券購入で設定 → 修行の流れ） */
+  const [battleOpen, setBattleOpen] = useState<boolean>(false);
+  const openBattle = () => {
+    setBattleKey((k) => k + 1);
+    setBattleOpen(true);
+  };
+  const closeBattle = () => setBattleOpen(false);
+
+  // ポップアップ表示中は背面のスクロールを止める
+  useEffect(() => {
+    document.body.style.overflow = battleOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [battleOpen]);
 
   /** 1ゲームの結果を記録。自己ベスト更新なら true */
   const handleRecord = useCallback((r: GameResult): boolean => {
@@ -130,7 +145,7 @@ export default function App() {
   }, []);
 
   const handleNavigate = (screen: ScreenType) => {
-    if (screen === 'typing-battle') setBattleKey((k) => k + 1);
+    setBattleOpen(false);
     setCurrentScreen(screen);
   };
 
@@ -144,17 +159,7 @@ export default function App() {
 
       <main className="w-full pt-44 lg:pt-32 flex-1 max-w-[920px] mx-auto px-4">
         {currentScreen === 'ticket-vending' && (
-          <TicketVending initialSettings={settings} bestScores={userStats.bestScores} onStartGame={handleStartGame} />
-        )}
-
-        {currentScreen === 'typing-battle' && (
-          <TypingBattle
-            key={battleKey}
-            settings={settings}
-            onRecord={handleRecord}
-            onShowBoard={() => setCurrentScreen('leaderboard')}
-            onQuit={() => setCurrentScreen('ticket-vending')}
-          />
+          <TicketVending initialSettings={settings} bestScores={userStats.bestScores} onStartGame={handleStartGame} active={!battleOpen} />
         )}
 
         {currentScreen === 'call-master' && <CallMaster onGoToLeaderboard={() => setCurrentScreen('leaderboard')} onBack={() => setCurrentScreen('ticket-vending')} />}
@@ -163,7 +168,7 @@ export default function App() {
           <Leaderboard
             userStats={userStats}
             lastResult={lastResult}
-            onPlayAgain={() => handleNavigate('typing-battle')}
+            onPlayAgain={openBattle}
             onBackToShop={() => setCurrentScreen('ticket-vending')}
           />
         )}
@@ -174,6 +179,27 @@ export default function App() {
       </main>
 
       <Footer onNavigate={handleNavigate} />
+
+      {/* タイピング修行（ポップアップ） */}
+      {battleOpen && (
+        <div
+          id="battlePopup"
+          role="dialog"
+          aria-modal="true"
+          aria-label="タイピング修行"
+          className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4"
+        >
+          <div className="relative w-full max-w-[860px] max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto bg-[#131313] border-4 border-[#353534] rounded-2xl shadow-hard-xl">
+            <TypingBattle
+              key={battleKey}
+              settings={settings}
+              onRecord={handleRecord}
+              onShowBoard={() => handleNavigate('leaderboard')}
+              onQuit={closeBattle}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

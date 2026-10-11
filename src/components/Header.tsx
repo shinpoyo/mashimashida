@@ -92,17 +92,6 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           </button>
           <button
             type="button"
-            onClick={() => onNavigate('typing-battle')}
-            className={`px-3 py-1.5 rounded transition-all whitespace-nowrap text-sm cursor-pointer ${
-              currentScreen === 'typing-battle'
-                ? 'bg-[#ffe100] text-[#0e0e0e] font-dela shadow-[0_3px_0_#000000]'
-                : 'text-[#cec6aa] font-bold hover:bg-[#2a2a2a] hover:text-[#e5e2e1]'
-            }`}
-          >
-            タイピング修行
-          </button>
-          <button
-            type="button"
             onClick={() => onNavigate('call-master')}
             className={`px-3 py-1.5 rounded transition-all whitespace-nowrap text-sm cursor-pointer ${
               currentScreen === 'call-master'
@@ -205,14 +194,6 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           }`}
         >
           食券購入
-        </button>
-        <button
-          onClick={() => onNavigate('typing-battle')}
-          className={`px-2.5 py-1 text-xs rounded whitespace-nowrap cursor-pointer ${
-            currentScreen === 'typing-battle' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
-          }`}
-        >
-          タイピング修行
         </button>
         <button
           onClick={() => onNavigate('call-master')}

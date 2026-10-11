@@ -1,4 +1,4 @@
-export type ScreenType = 'ticket-vending' | 'typing-battle' | 'call-master' | 'leaderboard' | 'my-kitchen';
+export type ScreenType = 'ticket-vending' | 'call-master' | 'leaderboard' | 'my-kitchen';
 
 /** ゲームモード（mashimashityping の4モード） */
 export type GameMode = 'easy' | 'normal' | 'hard' | 'super';

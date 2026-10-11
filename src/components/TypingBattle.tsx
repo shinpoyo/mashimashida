@@ -89,7 +89,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const timers = useRef<number[]>([]);
   const rafId = useRef<number>(0);
   const timerBar = useRef<HTMLDivElement>(null);
-  const angerBar = useRef<HTMLDivElement>(null);
 
   const later = (fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms));
@@ -165,7 +164,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       timerBar.current.style.width = `${ratio * 100}%`;
       timerBar.current.style.background = ratio < 0.35 ? '#ff5555' : '#ffe100';
     }
-    if (angerBar.current) angerBar.current.style.width = `${Math.min(100, (1 - ratio) * 65 + s.breaks * 15)}%`;
     if (ratio <= 0) return timeout();
     // 残り時間わずか：拍子木で急かす（終盤ほど速く）
     const now = performance.now();
@@ -286,7 +284,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     say('食券を拝見します', 'wait');
     setPhaseBoth('countdown');
     if (timerBar.current) timerBar.current.style.width = '100%';
-    if (angerBar.current) angerBar.current.style.width = '0%';
     let n = 3;
     const tick = () => {
       if (n > 0) {
@@ -401,6 +398,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
           <>持ち時間（黄色のバー）を過ぎると<b className="text-[#ff5555]">ロット乱し</b>。ミスタイプは正確率と称号に響きます。</>,
         ];
     return (
+      <div className="p-4 sm:p-5">
       <RuleIntro
         eyebrow="タイピング修行"
         title={ticket.name}
@@ -426,283 +424,168 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
         onStart={start}
         onBack={onQuit}
       />
+      </div>
     );
   }
 
   return (
-    <div className={`flex flex-col w-full pb-16 ${shake ? 'animate-jiro-shake' : ''}`}>
-      {/* Top Danger Bar */}
-      <div className="w-full bg-[#0e0e0e] rounded-xl p-3 shadow-md mb-4 flex flex-col md:flex-row items-center justify-between gap-3 border border-[#353534]">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1 bg-[#970015] text-[#ffdad7] px-2.5 py-1 rounded text-xs font-dela uppercase">
-            <span className="material-symbols-outlined text-sm animate-pulse text-[#ffe100]">local_fire_department</span>
-            DANGER LOT STATUS
-          </span>
-          <span className="font-dela text-sm sm:text-base text-[#e5e2e1]">
-            食券：<span className="text-[#ffe100]">{ticket.name}</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-3 text-xs font-mono-code font-bold">
-          <span className="text-[#cec6aa]">退店ペナルティ「{rule.name}」:</span>
-          {breaksLimit === null ? (
-            <span className="text-[#cec6aa]">ロット乱し {s.breaks}回（退店なし）</span>
-          ) : (
-            <>
-              <div className="flex items-center gap-1 text-base">
-                {Array.from({ length: breaksLimit }).map((_, idx) => (
-                  <span key={idx} className={idx < s.breaks ? 'text-[#ff5555]' : 'text-[#4c4732]'}>
-                    {idx < s.breaks ? '❌' : '⚪'}
-                  </span>
-                ))}
-              </div>
-              <span className="text-[#ffb4ab] text-xs">
-                {rule.maxMisses !== null ? `ミス ${s.miss}/${rule.maxMisses}` : `残り${Math.max(0, breaksLimit - s.breaks)}回で強制退店`}
-              </span>
-            </>
-          )}
-        </div>
+    <div className={`relative flex flex-col gap-3 p-3 sm:p-4 ${shake ? 'animate-jiro-shake' : ''}`}>
+      {/* 上段：状況を1行に集約 */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-bold">
+        <span className={`px-2 py-0.5 rounded font-dela ${ticket.tone === 'red' || ticket.tone === 'black' ? 'bg-[#970015] text-[#ffdad7]' : 'bg-[#ffe100] text-[#0e0e0e]'}`}>
+          {ticket.name}
+        </span>
+        <span className="text-[#cec6aa]">
+          ロット <b id="hudLot" className="font-mono-code text-base text-[#ffe100]">{lotNo}/{cfg.lots}</b>
+        </span>
+        <span className="text-[#cec6aa]">
+          スコア <b id="hudScore" className="font-mono-code text-base text-[#ffffff]">{s.score}</b>
+          <span className="font-mono-code text-[10px] ml-0.5">×{scoreMult.toFixed(1)}</span>
+        </span>
+        <span className="text-[#cec6aa]">
+          ミス <b id="hudMiss" className="font-mono-code text-base text-[#ffb3ae]">{s.miss}{rule.maxMisses !== null ? `/${rule.maxMisses}` : ''}</b>
+        </span>
+        <span className="text-[#cec6aa]">
+          乱し{' '}
+          <b className={`font-mono-code text-base ${breaksLimit !== null && s.breaks >= breaksLimit - 1 ? 'text-[#ff5555]' : 'text-[#ffb3ae]'}`}>
+            {s.breaks}
+            {breaksLimit !== null ? `/${breaksLimit}` : ''}
+          </b>
+        </span>
+        <span className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={togglePause}
+            className="px-2.5 py-1 bg-[#2a2a2a] hover:bg-[#353534] text-[#e5e2e1] rounded font-dela text-[11px] cursor-pointer"
+          >
+            一時休戦 Esc
+          </button>
+          <button
+            type="button"
+            onClick={giveUp}
+            className="px-2.5 py-1 bg-[#970015] hover:bg-[#c0282d] text-[#ffdad7] rounded font-dela text-[11px] cursor-pointer"
+          >
+            ギブアップ
+          </button>
+        </span>
       </div>
 
-      {/* 4 HUD Metric Boxes */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-        <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-3 shadow-hard-sm">
-          <span className="text-[10px] text-[#cec6aa] block font-bold">ロット</span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="font-mono-code text-2xl font-black text-[#ffe100]" id="hudLot">{lotNo}/{cfg.lots}</span>
-            <span className="text-[10px] text-[#cec6aa] font-mono-code">LOT</span>
-          </div>
+      {/* 店内：店主・吹き出し・提供カウンター（超ハードは出題の丼） */}
+      <div className="flex items-center gap-3 bg-[#1c1b1b] border-2 border-[#353534] rounded-xl px-3 py-2">
+        <ChefPhoto mood={mood} className="w-14 h-14 rounded-full" ringClass="ring-2" />
+        <div
+          key={bubbleKey}
+          id="staffBubble"
+          className="animate-pop flex-1 min-w-0 bg-[#201f1f] text-[#e5e2e1] px-3 py-2 rounded-lg border border-[#353534] text-sm sm:text-base font-black truncate"
+        >
+          {bubble}
         </div>
-        <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-3 shadow-hard-sm">
-          <span className="text-[10px] text-[#cec6aa] block font-bold">スコア</span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="font-mono-code text-2xl font-black text-[#ffffff]" id="hudScore">{s.score}</span>
-            <span className="text-[10px] text-[#cec6aa] font-mono-code">×{scoreMult.toFixed(2)}</span>
-          </div>
-        </div>
-        <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-3 shadow-hard-sm">
-          <span className="text-[10px] text-[#cec6aa] block font-bold">ミス</span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="font-mono-code text-2xl font-black text-[#ffb3ae]" id="hudMiss">{s.miss}</span>
-            <span className="text-[10px] text-[#ffb3ae] font-mono-code">MISS</span>
-          </div>
-        </div>
-        <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-3 shadow-hard-sm">
-          <span className="text-[10px] text-[#cec6aa] block font-bold">連続正解</span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="font-mono-code text-2xl font-black text-[#ffe100]">{s.chain}</span>
-            <span className="text-[10px] text-[#cec6aa] font-mono-code">CHAIN!</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Battle Stage: Chef / Served bowl / Buffs */}
-      <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-4 sm:p-5 shadow-xl mb-6 relative overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
-          <div className="md:col-span-6 flex items-center gap-4">
-            <div className="relative shrink-0">
-              <ChefPhoto mood={mood} className="w-24 h-24 rounded-full" />
-            </div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-dela text-[#ffe100]">頑固店主</span>
-                <span className="text-[10px] font-mono-code text-[#ffb3ae] bg-[#0e0e0e] px-1.5 py-0.5 rounded border border-[#4c4732]">👁 凝視中</span>
-              </div>
-              <div key={bubbleKey} id="staffBubble" className="animate-pop mt-2 bg-[#201f1f] text-[#e5e2e1] p-2.5 rounded-lg border border-[#353534] text-base font-black leading-relaxed shadow">
-                {bubble}
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-[10px] text-[#cec6aa] font-bold">激怒度</span>
-                <div className="flex-1 h-1.5 bg-[#0e0e0e] rounded overflow-hidden">
-                  <div ref={angerBar} className="h-full w-0 bg-gradient-to-r from-[#ffe100] to-[#ff5555]" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="md:col-span-3 flex flex-col items-center justify-center">
-            <div className="relative w-36 h-36 flex items-center justify-center">
-              {/* 提供ゲージ（提供杯数 / ロット数） */}
-              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="46" stroke="#353534" strokeWidth="6" fill="transparent" />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="46"
-                  stroke="#ffe100"
-                  strokeWidth="6"
-                  fill="transparent"
-                  strokeDasharray="289"
-                  strokeDashoffset={289 - (289 * s.served) / cfg.lots}
-                  strokeLinecap="round"
-                  className="transition-all duration-300"
-                />
-              </svg>
-              <div
-                key={serveKey}
-                className={`absolute inset-2.5 rounded-full overflow-hidden border-2 ${
-                  counter === 'ng' ? 'border-[#970015]' : 'border-[#ffe100]'
-                } ${counter === 'served' ? 'animate-serve' : ''}`}
-              >
-                <RamenPhoto
-                  className={`w-full h-full transition-all duration-300 ${
-                    counter === 'cooking' ? 'brightness-50 saturate-50' : counter === 'ng' ? 'grayscale brightness-75' : ''
-                  }`}
-                  position="49% 60%"
-                />
-                {counter !== 'served' && (
-                  <span className={`absolute inset-x-0 bottom-3 text-center font-dela text-[11px] drop-shadow-[1px_1px_0_#000] ${counter === 'ng' ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
-                    {counter === 'ng' ? 'ロット乱し' : '調理中…'}
-                  </span>
-                )}
-              </div>
-            </div>
-            <span className="mt-1 text-[10px] text-[#cec6aa] font-bold">提供カウンター（{s.served}/{cfg.lots}杯）</span>
-          </div>
-
-          <div className="md:col-span-3 flex flex-col gap-1.5 text-xs font-bold bg-[#0e0e0e] p-3 rounded-lg border border-[#353534]">
-            <span className="text-[10px] text-[#cec6aa]">退店ペナルティ「{rule.name}」</span>
-            <div className="flex justify-between items-center">
-              <span className="text-[#e5e2e1]">ロット乱し</span>
-              <span className={`font-mono-code ${rule.maxBreaks !== null && s.breaks >= rule.maxBreaks - 1 ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
-                {s.breaks}
-                {rule.maxBreaks !== null ? ` / ${rule.maxBreaks}` : '回'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[#e5e2e1]">ミス</span>
-              <span className={`font-mono-code ${rule.maxMisses !== null && s.miss >= rule.maxMisses - 1 ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
-                {s.miss}
-                {rule.maxMisses !== null ? ` / ${rule.maxMisses}` : '回'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[#e5e2e1]">スコア倍率</span>
-              <span className="font-mono-code text-[#ffe100]">×{rule.scoreRate.toFixed(1)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* MAIN CALL CARD */}
-      <div
-        id="callCard"
-        className={`bg-[#201f1f] border-4 rounded-2xl p-6 sm:p-8 shadow-hard-xl mb-6 relative transition-colors ${
-          cardState === 'ok' ? 'border-[#ffe100]' : cardState === 'ng' ? 'border-[#970015]' : 'border-[#353534]'
-        } ${showCall ? '' : 'invisible'}`}
-      >
-        <div className="flex items-center justify-between pb-4 border-b border-[#353534]">
-          <div className="flex items-center gap-3">
-            <span className="px-3 py-1 bg-[#ffe100] text-[#0e0e0e] font-dela text-sm rounded shadow-hard-sm whitespace-nowrap">
-              {String(lotNo).padStart(2, '0')} / {String(cfg.lots).padStart(2, '0')}
-            </span>
-            <span className="font-dela text-sm sm:text-base text-[#e5e2e1]">{cfg.super ? 'この丼になるコールを答えよ' : 'あなたのコール'}</span>
-          </div>
-          <span className="font-dela text-xs text-[#ffe100] hidden sm:inline-block">
-            {cfg.super ? '順不同OK・全マシOK' : cfg.shuffle ? 'LEVEL: 順不同' : 'LEVEL: 定番コール'}
-          </span>
-        </div>
-
-        {cfg.super && shownCall && (
-          <div className="grid grid-cols-[1fr_110px] gap-4 items-end mt-4">
-            <div className="justify-self-center w-full max-w-[250px] rounded-xl border-2 border-[#353534] bg-[radial-gradient(ellipse_at_50%_70%,#3a2a1c,#120e0b)]">
+        {cfg.super && shownCall ? (
+          <div className="flex items-end gap-2 shrink-0">
+            <div className="w-40 sm:w-48 rounded-lg border-2 border-[#353534] bg-[radial-gradient(ellipse_at_50%_70%,#3a2a1c,#120e0b)]">
               <BowlView lv={shownCall.lv} seed={shownIdx + 1} />
             </div>
-            <div className="text-center opacity-80">
+            <div className="w-14 text-center opacity-80">
               <BowlView lv={DEFAULT_LV} seed={999} />
-              <span className="text-[10px] text-[#cec6aa] font-bold">基準：そのまま</span>
+              <span className="text-[9px] text-[#cec6aa] font-bold leading-none">基準</span>
+            </div>
+          </div>
+        ) : (
+          <div className="relative w-16 h-16 shrink-0" title={`提供 ${s.served}/${cfg.lots}杯`}>
+            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="46" stroke="#353534" strokeWidth="7" fill="transparent" />
+              <circle
+                cx="50"
+                cy="50"
+                r="46"
+                stroke="#ffe100"
+                strokeWidth="7"
+                fill="transparent"
+                strokeDasharray="289"
+                strokeDashoffset={289 - (289 * s.served) / cfg.lots}
+                strokeLinecap="round"
+                className="transition-all duration-300"
+              />
+            </svg>
+            <div
+              key={serveKey}
+              className={`absolute inset-1.5 rounded-full overflow-hidden border ${counter === 'ng' ? 'border-[#970015]' : 'border-[#ffe100]'} ${counter === 'served' ? 'animate-serve' : ''}`}
+            >
+              <RamenPhoto
+                className={`w-full h-full transition-all duration-300 ${counter === 'cooking' ? 'brightness-50 saturate-50' : counter === 'ng' ? 'grayscale brightness-75' : ''}`}
+                position="49% 60%"
+              />
             </div>
           </div>
         )}
+      </div>
 
-        <div className="my-6 text-center">
-          <h1 id="callDisplay" className={`font-dela text-[#ffe100] tracking-wider leading-tight drop-shadow-[2px_3px_0_#000000] break-all ${cfg.super ? 'text-xl sm:text-2xl min-h-[1.3em]' : 'text-3xl sm:text-5xl min-h-[1.2em]'}`}>
-            {cfg.super ? revealed : shownCall?.display}
-          </h1>
-          <p className="font-bold text-sm sm:text-base text-[#cec6aa] mt-2 font-mplus tracking-widest min-h-[1.5em]">
-            {cfg.super ? (
-              <span className="text-[#ffe100]">{kanaSrc.slice(0, kanaDone)}</span>
-            ) : (
-              <>
-                <span className="text-[#4c4732]">{kanaSrc.slice(0, kanaDone)}</span>
-                {kanaSrc.slice(kanaDone)}
-              </>
-            )}
-          </p>
+      {/* 主役：コールと入力 */}
+      <div
+        id="callCard"
+        className={`bg-[#0e0e0e] border-4 rounded-2xl px-4 py-5 text-center transition-colors ${
+          cardState === 'ok' ? 'border-[#ffe100]' : cardState === 'ng' ? 'border-[#970015]' : 'border-[#353534]'
+        } ${showCall ? '' : 'invisible'}`}
+      >
+        <div className="text-[11px] font-dela text-[#cec6aa]">{cfg.super ? 'この丼になるコールを答えよ（順不同・全マシOK）' : 'あなたのコール'}</div>
+        <h1
+          id="callDisplay"
+          className={`font-dela text-[#ffe100] tracking-wider leading-tight drop-shadow-[2px_3px_0_#000000] break-all mt-1 ${
+            cfg.super ? 'text-xl sm:text-2xl min-h-[1.3em]' : 'text-3xl sm:text-4xl min-h-[1.2em]'
+          }`}
+        >
+          {cfg.super ? revealed : shownCall?.display}
+        </h1>
+        <p className="font-bold text-sm sm:text-base text-[#cec6aa] mt-1 tracking-widest min-h-[1.5em]">
+          {cfg.super ? (
+            <span className="text-[#ffe100]">{kanaSrc.slice(0, kanaDone)}</span>
+          ) : (
+            <>
+              <span className="text-[#4c4732]">{kanaSrc.slice(0, kanaDone)}</span>
+              {kanaSrc.slice(kanaDone)}
+            </>
+          )}
+        </p>
+        <div id="callRomaji" className="mt-2 font-mono-code font-black text-2xl sm:text-3xl tracking-widest break-all select-none min-h-[1.3em]">
+          <span className="text-[#ffe100]">{typer?.typed}</span>
+          {cardState === 'ng' && !cfg.super ? (
+            <span className="text-[#ff5555]">{typer?.rest()}</span>
+          ) : cfg.super ? (
+            phase === 'play' && <span className="inline-block w-[0.7em] rounded bg-[#ffe100] animate-pulse">&nbsp;</span>
+          ) : (
+            <>
+              {rest && <span className="cur inline-block px-1 rounded bg-[#ffe100] text-[#0e0e0e] shadow-[0_0_10px_#ffe100]">{rest.slice(0, 1)}</span>}
+              <span className="text-[#cec6aa]/60">{rest.slice(1)}</span>
+            </>
+          )}
         </div>
-
-        <div className="bg-[#0e0e0e] border-2 border-[#353534] rounded-xl p-4 sm:p-6 text-center font-mono-code font-black text-xl sm:text-3xl tracking-widest shadow-inner relative select-none">
-          <div id="callRomaji" className="break-all">
-            <span className="text-[#ffe100]">{typer?.typed}</span>
-            {cardState === 'ng' && !cfg.super ? (
-              <span className="text-[#ff5555]">{typer?.rest()}</span>
-            ) : cfg.super ? (
-              phase === 'play' && <span className="inline-block w-[0.7em] rounded bg-[#ffe100] animate-pulse">&nbsp;</span>
-            ) : (
-              <>
-                {rest && (
-                  <span className="cur inline-block px-1 rounded bg-[#ffe100] text-[#0e0e0e] shadow-[0_0_10px_#ffe100]">{rest.slice(0, 1)}</span>
-                )}
-                <span className="text-[#cec6aa]/60">{rest.slice(1)}</span>
-              </>
-            )}
-          </div>
-          <div className="mt-4 text-[11px] text-[#cec6aa] font-bold font-mplus flex items-center justify-center gap-1.5">
-            <span className="material-symbols-outlined text-sm">keyboard</span>
-            そのままキーボードで直打ち（shi/si・tsu/tu・nn/n などの表記ゆれ対応）
-          </div>
-        </div>
-
-        <div className="mt-4 h-2.5 bg-[#0e0e0e] border border-[#353534] rounded-full overflow-hidden">
+        <div className="mt-4 h-2 bg-[#201f1f] border border-[#353534] rounded-full overflow-hidden">
           <div ref={timerBar} className="h-full w-full bg-[#ffe100]" />
         </div>
-
-        <div className="mt-3 flex items-center gap-2 text-xs">
-          <span className="text-[#cec6aa] font-bold">直近判定:</span>
-          <span id="verdict" className="font-dela text-sm text-[#ffe100]">{verdict}</span>
+        <div className="mt-2 text-xs">
+          <span id="verdict" className="font-dela text-[#ffe100]">{verdict}</span>
         </div>
       </div>
 
-      <div className="mb-6">
-        <VirtualKeyboard nextKey={nextKey} hidden={cfg.super} />
-      </div>
+      {/* 超ハードは答えを伏せるのでキーボードは出さない */}
+      {!cfg.super && <VirtualKeyboard nextKey={nextKey} />}
 
-      {/* Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#0e0e0e] p-3 rounded-xl border border-[#353534]">
-        <button
-          type="button"
-          onClick={togglePause}
-          className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#353534] text-[#e5e2e1] rounded-lg text-xs font-dela flex items-center gap-1 cursor-pointer transition-colors"
-        >
-          <span className="material-symbols-outlined text-sm">pause</span>
-          一時休戦 (Esc)
-        </button>
-        <span className="text-[11px] text-[#cec6aa] font-mono-code font-bold hidden sm:inline">Esc: 一時休戦</span>
-        <button
-          type="button"
-          onClick={giveUp}
-          className="px-4 py-2 bg-[#970015] hover:bg-[#c0282d] text-[#ffdad7] rounded-lg text-xs font-dela flex items-center gap-1 cursor-pointer transition-colors shadow-hard-red"
-        >
-          <span className="material-symbols-outlined text-sm">sentiment_very_dissatisfied</span>
-          ギブアップ退店
-        </button>
-      </div>
-
-      {/* COUNTDOWN */}
+      {/* カウントダウン */}
       {phase === 'countdown' && countdown > 0 && (
-        <div key={countdown} className="fixed inset-0 z-40 grid place-items-center bg-black/55 pointer-events-none">
-          <span className="font-dela text-[160px] text-[#ffe100] drop-shadow-[6px_6px_0_#000] animate-pop">{countdown}</span>
+        <div key={countdown} className="absolute inset-0 z-10 grid place-items-center bg-black/55 rounded-2xl pointer-events-none">
+          <span className="font-dela text-[140px] text-[#ffe100] drop-shadow-[6px_6px_0_#000] animate-pop">{countdown}</span>
         </div>
       )}
 
       {imeWarn && (
-        <div className="fixed left-1/2 bottom-5 -translate-x-1/2 z-50 bg-[#970015] text-[#ffdad7] px-4 py-2.5 rounded-lg font-bold shadow-hard">
+        <div className="absolute left-1/2 bottom-4 -translate-x-1/2 z-20 bg-[#970015] text-[#ffdad7] px-4 py-2 rounded-lg font-bold shadow-hard whitespace-nowrap">
           IMEがオンになっています。半角英数に切り替えてください。
         </div>
       )}
 
-      {/* PAUSE MODAL */}
+      {/* 一時休戦 */}
       {paused && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="absolute inset-0 z-20 bg-black/80 rounded-2xl flex items-center justify-center p-4">
           <div className="bg-[#1c1b1b] border-4 border-[#ffe100] rounded-2xl p-6 max-w-md w-full shadow-hard-xl text-center">
             <h2 className="font-dela text-2xl text-[#ffe100] mb-2">一時休戦中</h2>
             <p className="text-xs text-[#cec6aa] mb-6 font-bold leading-relaxed">店主「おい！箸を止めるんじゃねえ！ロットが乱れるぞ！」</p>
@@ -718,16 +601,16 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
         </div>
       )}
 
-      {/* RESULT MODAL */}
+      {/* 結果 */}
       {phase === 'over' && result && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="absolute inset-0 z-20 bg-black/85 rounded-2xl flex items-center justify-center p-4 overflow-y-auto">
           <div
             id="resultModal"
-            className={`bg-[#1c1b1b] border-4 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-hard-xl text-center ${
+            className={`bg-[#1c1b1b] border-4 rounded-2xl p-5 sm:p-6 max-w-lg w-full shadow-hard-xl text-center ${
               result.expelled || result.gaveUp ? 'border-[#970015]' : 'border-[#ffe100]'
             }`}
           >
-            <div className={`inline-block px-4 py-1.5 font-dela text-sm rounded-full mb-3 shadow ${result.expelled || result.gaveUp ? 'bg-[#970015] text-[#ffdad7]' : 'bg-[#ffe100] text-[#0e0e0e]'}`}>
+            <div className={`inline-block px-4 py-1.5 font-dela text-sm rounded-full mb-2 shadow ${result.expelled || result.gaveUp ? 'bg-[#970015] text-[#ffdad7]' : 'bg-[#ffe100] text-[#0e0e0e]'}`}>
               {result.expelled ? '強制退店処分' : result.gaveUp ? 'ギブアップ退店' : '★ ロット完走！完飲完食 ★'}
             </div>
             <div className="text-[11px] text-[#cec6aa] font-bold">食券：{ticket.name} ／ ペナルティ：{rule.name}</div>
@@ -735,8 +618,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
             <h2 id="resRank" className={`font-dela text-4xl sm:text-5xl tracking-wider mb-1 drop-shadow-[2px_2px_0_#000] ${result.expelled || result.gaveUp ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
               {result.rank}
             </h2>
-            <p className="text-xs text-[#cec6aa] font-bold mb-5">{result.rankComment}</p>
-
+            <p className="text-xs text-[#cec6aa] font-bold mb-4">{result.rankComment}</p>
             <div className="grid grid-cols-3 gap-3 bg-[#0e0e0e] p-4 rounded-xl border border-[#353534] mb-4 text-center">
               {[
                 ['スコア', String(result.score), 'text-[#ffe100]'],
@@ -753,7 +635,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
               ))}
             </div>
             {result.isBest && <div className="mb-4 py-1.5 bg-[#ffe100] text-[#0e0e0e] font-dela rounded">🏆 自己ベスト更新！</div>}
-
             <div className="flex flex-col sm:flex-row gap-3">
               <button type="button" onClick={start} className="flex-1 py-3.5 px-4 bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-sm rounded-xl shadow-hard-lg cursor-pointer">
                 もう一杯（Space）
