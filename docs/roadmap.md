@@ -50,7 +50,8 @@
 - [x] CI（型チェック・テスト・ビルド）と GitHub Pages デプロイの workflow
 - [x] 公開先・ライセンスの決定（公開リポジトリ＋GitHub Pages、権利保持。[publishing.md](publishing.md)）
 - [x] `main` へのプルリクエスト作成
-- [ ] マージ・リポジトリ公開・Pages の有効化（オーナー作業）
+- [x] マージ・リポジトリ公開・Pages の有効化 → https://shinpoyo.github.io/mashimashida/ で公開
+- [x] 独自ドメイン shinpoyo.com（案 A：個人サイト化 → https://shinpoyo.com/mashimashida/ 。[custom-domain.md](custom-domain.md)）
 
 ## フェーズ4：全国完飲番付（オンライン化）
 

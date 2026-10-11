@@ -1,6 +1,11 @@
 # 公開手順
 
-## 現状（2026-10-11）
+## 公開済み（2026-10-11）
+
+- **https://shinpoyo.com/mashimashida/** で公開中（2026-10-11 に独自ドメインへ移行。旧 URL `shinpoyo.github.io/mashimashida/` からは自動転送）
+- 独自ドメインにする場合は [custom-domain.md](custom-domain.md)
+
+## 公開前の状況（2026-10-11 当時の記録）
 
 - リポジトリ `shinpoyo/mashimashida` は **非公開（private）**
 - 作業はすべて `claude/peaceful-shannon-j91m6m` ブランチにあり、**`main` にはまだ入っていない**

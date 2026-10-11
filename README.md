@@ -6,6 +6,8 @@
 - **デザイン**：mashimashida（React 版）のダーク×イエロー UI、写真の丼・店主（AI 生成画像）
 - **ロジック**：[mashimashityping](https://github.com/shinpoyo/mashimashityping) のローマ字判定・コール生成・SVG 丼描画を TypeScript に移植
 
+▶ **プレイ：** https://shinpoyo.com/mashimashida/
+
 > キーボードでのプレイ前提です（スマホ非対応）。
 
 ## 遊び方
@@ -70,6 +72,7 @@ docs/            統合分析・作業履歴・ロードマップ
 - [コンプライアンスチェック](docs/compliance.md)
 - [ラーメン画像の差分計画](docs/image-variants.md)
 - [公開手順](docs/publishing.md)
+- [独自ドメインの取得と設定](docs/custom-domain.md)
 
 ## 権利・ライセンス
 

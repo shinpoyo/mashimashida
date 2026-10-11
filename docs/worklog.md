@@ -311,3 +311,53 @@
 - 「ラーメン二郎」表記が残る統合前のモック `mock/` を削除（Git 履歴から復元可能）
 - CI 初回実行：成功（型チェック・テスト・ビルド）
 - [publishing.md](publishing.md) にオーナー作業（マージ → 公開設定 → Pages 有効化 → 初回デプロイ）を記載
+
+---
+
+## 2026-10-11 公開完了・独自ドメインの調査
+
+### 依頼
+- PR をマージした。ドメイン取得について教えてほしい
+
+### 確認
+- 「Deploy to GitHub Pages」成功。https://shinpoyo.github.io/mashimashida/ が 200 を返し、og:image も公開 URL で出力されている
+- 公開サイトをブラウザで開き、食券購入 → ルール説明 → プレイ開始まで動作（JS エラー・読み込み失敗なし）
+
+### 作業内容
+- [custom-domain.md](custom-domain.md) を作成：ドメイン名の候補と空き状況（RDAP で確認）、登録業者の比較、GitHub Pages への設定手順（所有確認・DNS・Custom domain・HTTPS）、アプリ側は変更不要であること
+- README にプレイ URL、publishing.md・roadmap に公開済みを反映
+- 作業ブランチは PR #1 マージ後の main から作り直した
+
+---
+
+## 2026-10-11 shinpoyo.com 取得・2要素認証の案内
+
+- ユーザーが Cloudflare Registrar で **shinpoyo.com** を取得（RDAP で登録・期限 2027-10-11・Cloudflare ネームサーバーを確認。DNS レコードはまだなし）
+- Cloudflare の2要素認証の場所を案内（My Profile → Authentication）。公式ドキュメントで手順を確認
+- shinpoyo.com の使い方として「A. 個人サイト化（shinpoyo.com/各プロジェクト/）」「B. ゲームごとのサブドメイン」を整理し、[custom-domain.md](custom-domain.md) に追記
+
+---
+
+## 2026-10-11 案 A（個人サイト化）に着手
+
+- 方針決定：shinpoyo.com を個人サイトにし、各プロジェクトを `shinpoyo.com/<リポジトリ名>/` で配信
+- 個人サイト（`shinpoyo.github.io` リポジトリ）の中身を用意：作品一覧のトップページ・404・README・設定手順・作業履歴
+  - 一覧：マシマシ打・けしカス・もぐもぐカメラ。旧版 mashimashityping は「ラーメン二郎」表記が残るため載せない
+  - PC・スマホ幅で表示確認（横スクロールなし）
+- GitHub 上のリポジトリ作成は権限不足（403）でできなかったため、ユーザーに空リポジトリの作成を依頼。作成後に push する
+- [custom-domain.md](custom-domain.md) に決定事項と DNS の値を追記
+
+---
+
+## 2026-10-11 独自ドメイン shinpoyo.com へ移行
+
+- ユーザーが `shinpoyo/shinpoyo.github.io` を作成 → 個人サイトを push（詳細はそちらの `docs/worklog.md`）
+- ユーザーが Cloudflare DNS（所有確認 TXT・A×4・AAAA×4・CNAME www）、Custom domain、Enforce HTTPS を設定
+- 確認（DoH・curl）：
+  - DNS は A / AAAA / CNAME とも正しい値
+  - `https://shinpoyo.com/`・`/mashimashida/`・`/keshikasu/`・`/mogumogu-camera/`・`/smudge-privacy/` すべて 200（証明書も有効）
+  - `https://www.shinpoyo.com/` → `https://shinpoyo.com/`、`https://shinpoyo.github.io/mashimashida/` → `https://shinpoyo.com/mashimashida/` に 301 転送
+- 「Deploy to GitHub Pages」を手動実行 → OGP の URL が `http://shinpoyo.com/...`（http）になった
+  - 原因：`configure-pages` の `base_url` が http を返した（HTTPS 強制が反映される前のため）
+  - 対応：workflow で `https://` に揃えてから `SITE_URL` に渡すよう修正（main に入ったら再デプロイで直る）
+- README・publishing.md・custom-domain.md・roadmap のプレイ URL を `https://shinpoyo.com/mashimashida/` に更新
