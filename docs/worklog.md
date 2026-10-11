@@ -361,3 +361,4 @@
   - 原因：`configure-pages` の `base_url` が http を返した（HTTPS 強制が反映される前のため）
   - 対応：workflow で `https://` に揃えてから `SITE_URL` に渡すよう修正（main に入ったら再デプロイで直る）
 - README・publishing.md・custom-domain.md・roadmap のプレイ URL を `https://shinpoyo.com/mashimashida/` に更新
+- PR #2 マージ → 自動デプロイで OGP（`og:url`・`og:image`・`twitter:image`）が `https://shinpoyo.com/mashimashida/` になったことを確認。`ogp.jpg` も 200
