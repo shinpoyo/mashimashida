@@ -2,6 +2,26 @@
 
 現在の公開 URL：`https://shinpoyo.github.io/mashimashida/`（2026-10-11 公開）
 
+## 取得済み（2026-10-11）
+
+- **shinpoyo.com**（Cloudflare Registrar）。登録日 2026-10-11、有効期限 2027-10-11、ネームサーバーは Cloudflare
+- まだ DNS レコードはなし（GitHub Pages への設定は未着手）
+
+### Cloudflare アカウントの2要素認証
+1. ダッシュボード右上の人型アイコン（My Profile）→ **My Profile**
+2. 左メニュー（または上部タブ）の **Authentication**
+3. **Mobile App Authentication** の Add（認証アプリ）／ **Security Key Authentication** の Add（物理キー・パスキー）／ **Email Authentication** の Enable から選ぶ
+4. 表示される**リカバリーコード（バックアップコード）を必ず保存**（パスワードマネージャー等）
+- 注意：メールアドレスが確認済みでないと有効化できない。Cloudflare は2種類以上の方法の登録を推奨
+- Google アカウントでログインしている場合は、Google アカウント側の2段階認証も有効にしておく
+
+### shinpoyo.com の使い方（案）
+| 案 | URL の例 | 設定 |
+|---|---|---|
+| A. 個人サイト化 | `shinpoyo.com/mashimashida/`、`shinpoyo.com/mashimashityping/` … | `shinpoyo/shinpoyo.github.io` リポジトリを作り、その Pages に `shinpoyo.com` を設定。公開中のプロジェクトのページが全部この下に移る |
+| B. ゲームごとにサブドメイン | `mashimashi.shinpoyo.com` | mashimashida リポジトリの Pages に設定。CNAME `mashimashi` → `shinpoyo.github.io` |
+
+
 ## 1. ドメイン名を決める
 
 - 「二郎」「jiro」など実在店舗・商標を含む名前は避ける（[compliance.md](compliance.md)）

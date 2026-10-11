@@ -327,3 +327,11 @@
 - [custom-domain.md](custom-domain.md) を作成：ドメイン名の候補と空き状況（RDAP で確認）、登録業者の比較、GitHub Pages への設定手順（所有確認・DNS・Custom domain・HTTPS）、アプリ側は変更不要であること
 - README にプレイ URL、publishing.md・roadmap に公開済みを反映
 - 作業ブランチは PR #1 マージ後の main から作り直した
+
+---
+
+## 2026-10-11 shinpoyo.com 取得・2要素認証の案内
+
+- ユーザーが Cloudflare Registrar で **shinpoyo.com** を取得（RDAP で登録・期限 2027-10-11・Cloudflare ネームサーバーを確認。DNS レコードはまだなし）
+- Cloudflare の2要素認証の場所を案内（My Profile → Authentication）。公式ドキュメントで手順を確認
+- shinpoyo.com の使い方として「A. 個人サイト化（shinpoyo.com/各プロジェクト/）」「B. ゲームごとのサブドメイン」を整理し、[custom-domain.md](custom-domain.md) に追記
