@@ -11,13 +11,16 @@ import { TicketVending } from './components/TicketVending';
 import { TypingBattle } from './components/TypingBattle';
 import { CallMaster } from './components/CallMaster';
 import { Leaderboard } from './components/Leaderboard';
-import { MyKitchen } from './components/MyKitchen';
-import { TICKET_CONFIGS } from './data/shop';
+import { RegularCard } from './components/RegularCard';
+import { TICKET_CONFIGS, MODE_ORDER } from './data/shop';
+import { DEFAULT_AVATAR, DEFAULT_PLAYER_NAME } from './data/player';
 
 const STATS_KEY = 'mashimashida_stats_v2';
 const SETTINGS_KEY = 'mashimashida_settings_v1';
 
 const EMPTY_STATS: UserStats = {
+  playerName: DEFAULT_PLAYER_NAME,
+  avatar: DEFAULT_AVATAR,
   bowlsCleared: 0,
   strikesCount: 0,
   maxWpm: 0,
@@ -69,7 +72,8 @@ export default function App() {
   const [settings, setSettings] = useState<GameSettings>(() => {
     // 旧バージョンの保存設定（トッピング券など）は必要な項目だけ取り出す
     const s = load(SETTINGS_KEY, DEFAULT_SETTINGS);
-    return { mode: s.mode, penalty: s.penalty };
+    // オフにしたモード（超ハードなど）が保存されていたら小ラーメンに戻す
+    return { mode: MODE_ORDER.includes(s.mode) ? s.mode : 'easy', penalty: s.penalty };
   });
   /** 同じ設定で再挑戦したときも TypingBattle を作り直すためのキー */
   const [battleKey, setBattleKey] = useState<number>(0);
@@ -155,7 +159,13 @@ export default function App() {
 
   return (
     <div className="bg-[#131313] font-mplus text-[#e5e2e1] min-h-screen flex flex-col">
-      <Header currentScreen={currentScreen} onNavigate={handleNavigate} bowlsCleared={userStats.bowlsCleared} />
+      <Header
+        currentScreen={currentScreen}
+        onNavigate={handleNavigate}
+        bowlsCleared={userStats.bowlsCleared}
+        playerName={userStats.playerName}
+        avatar={userStats.avatar}
+      />
 
       <main className="w-full pt-44 lg:pt-32 flex-1 max-w-[920px] mx-auto px-4">
         {currentScreen === 'ticket-vending' && (
@@ -173,8 +183,8 @@ export default function App() {
           />
         )}
 
-        {currentScreen === 'my-kitchen' && (
-          <MyKitchen userStats={userStats} onNavigate={handleNavigate} onUpdateStats={handleUpdateStats} />
+        {currentScreen === 'regular-card' && (
+          <RegularCard userStats={userStats} onNavigate={handleNavigate} onUpdateStats={handleUpdateStats} />
         )}
       </main>
 

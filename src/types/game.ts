@@ -1,4 +1,6 @@
-export type ScreenType = 'ticket-vending' | 'call-master' | 'leaderboard' | 'my-kitchen';
+import type { PlayerAvatar } from '../data/player';
+
+export type ScreenType = 'ticket-vending' | 'call-master' | 'leaderboard' | 'regular-card';
 
 /** ゲームモード（mashimashityping の4モード） */
 export type GameMode = 'easy' | 'normal' | 'hard' | 'super';
@@ -64,6 +66,9 @@ export interface GameResult {
 }
 
 export interface UserStats {
+  /** プレイヤー（常連客）の名前とアイコン */
+  playerName: string;
+  avatar: PlayerAvatar;
   bowlsCleared: number;
   strikesCount: number;
   maxWpm: number;

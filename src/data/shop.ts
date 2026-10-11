@@ -48,7 +48,11 @@ export const TICKET_CONFIGS: Record<GameMode, TicketConfig> = {
   },
 };
 
-export const MODE_ORDER: GameMode[] = ['easy', 'normal', 'hard', 'super'];
+/**
+ * 食券機に並べるモード（キー 1〜 の順）。
+ * 超ハード（super）は 2026-10-11 に一旦オフ。戻すときはここに 'super' を足すだけでよい。
+ */
+export const MODE_ORDER: GameMode[] = ['easy', 'normal', 'hard'];
 
 /** 退店ペナルティ（ゲーム開始前に選択） */
 export const PENALTY_RULES: PenaltyRule[] = [

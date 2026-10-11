@@ -2,6 +2,7 @@ import React from 'react';
 import { GameResult, UserStats } from '../types/game';
 import { TICKET_CONFIGS, MODE_ORDER, PENALTY_BY_ID } from '../data/shop';
 import { soundManager } from '../utils/audio';
+import { PlayerAvatar } from './PlayerAvatar';
 
 interface LeaderboardProps {
   userStats: UserStats;
@@ -94,14 +95,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
       {/* USER SUMMARY */}
       <div className="bg-[#201f1f] border-2 border-[#4c4732] rounded-xl p-4 sm:p-5 shadow-xl mb-8 flex flex-col lg:flex-row items-center justify-between gap-5">
         <div className="flex items-center gap-3 w-full lg:w-auto">
-          <div className="relative shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-[#ffe100] text-[#0e0e0e] flex items-center justify-center shadow">
-              <span className="material-symbols-outlined text-2xl">person</span>
-            </div>
-            <span className="absolute -bottom-1 -right-1 text-[9px] font-mono-code bg-[#0e0e0e] text-[#ffe100] px-1 rounded font-bold border border-[#ffe100]">YOU</span>
-          </div>
+          <PlayerAvatar avatar={userStats.avatar} size={52} />
           <div>
-            <span className="text-[10px] text-[#cec6aa] font-bold block">現在のあなたの格付け</span>
+            <span className="text-[10px] text-[#cec6aa] font-bold block">{userStats.playerName} の格付け</span>
             <h2 className="font-dela text-xl text-[#ffe100]">{userStats.title}</h2>
             <div className="text-xs font-mono-code text-[#cec6aa] font-bold mt-0.5">
               ロット通算: <strong className="text-[#ffffff]">{userStats.bowlsCleared}杯完飲</strong> / 撃沈 {userStats.strikesCount}回

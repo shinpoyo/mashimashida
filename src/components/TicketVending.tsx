@@ -44,13 +44,13 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
     onStartGame({ mode: selectedMode, penalty });
   };
 
-  // キーボード: 1〜4 で食券選択、Enter で着席
+  // キーボード: 数字キーで食券選択、Enter で着席
   useEffect(() => {
     if (!active) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      const idx = ['1', '2', '3', '4'].indexOf(e.key);
-      if (idx >= 0) {
+      const idx = Number(e.key) - 1;
+      if (Number.isInteger(idx) && idx >= 0 && idx < MODE_ORDER.length) {
         handleSelectMode(MODE_ORDER[idx]);
         return;
       }
@@ -105,7 +105,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
               </div>
             </div>
             <span className="text-[11px] font-bold text-[#cec6aa] hidden sm:inline">
-              キー <kbd className="kbd">1</kbd>〜<kbd className="kbd">4</kbd> で選択
+              キー <kbd className="kbd">1</kbd>〜<kbd className="kbd">{MODE_ORDER.length}</kbd> で選択
             </span>
           </div>
 
@@ -117,7 +117,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
             <span className="text-xs font-bold text-[#ffb3ae]">※一人一杯厳守・ロット乱し禁止</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             {MODE_ORDER.map((m, i) => {
               const t = TICKET_CONFIGS[m];
               const s = TONE_STYLES[t.tone];
@@ -128,23 +128,25 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
                   key={m}
                   data-mode={m}
                   onClick={() => handleSelectMode(m)}
-                  className={`group relative flex flex-col justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 shadow-md select-none border-2 ${
-                    selected ? `bg-[#353534] ${s.on} translate-y-0.5` : `${s.bg} border-[#4c4732] hover:bg-[#353534] ${s.hover}`
+                  className={`group grid grid-cols-[auto_1fr_auto] items-center gap-x-3 p-3 rounded-lg cursor-pointer transition-all duration-150 shadow-md select-none border-2 ${
+                    selected ? `bg-[#353534] ${s.on}` : `${s.bg} border-[#4c4732] hover:bg-[#353534] ${s.hover}`
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-dela ${s.badge}`}>{t.badge}</span>
-                    <span className={`font-mono-code text-lg font-bold ${s.price}`}>¥{t.price.toLocaleString()}</span>
-                  </div>
-                  <div className="my-2">
-                    <h3 className={`font-dela text-xl leading-tight transition-colors ${s.name}`}>{t.name}</h3>
+                  <span className="w-8 h-8 rounded bg-[#0e0e0e] border border-[#4c4732] text-[#ffe100] font-dela text-sm flex items-center justify-center">{i + 1}</span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className={`font-dela text-xl leading-tight ${s.name}`}>{t.name}</h3>
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-dela ${s.badge}`}>{t.badge}</span>
+                    </div>
                     <p className="text-xs text-[#cec6aa] mt-0.5 font-bold">
                       {t.noddle} / {t.desc}
                     </p>
                   </div>
-                  <div className="flex items-center justify-between text-xs font-mono-code pt-1 text-[#cec6aa]">
-                    <span className={best ? 'text-[#ffe100]' : ''}>{best ? `自己ベスト ${best.score}` : '未挑戦'}</span>
-                    <span className="text-[#ffe100] font-dela text-xs">[{i + 1}] 食券押下 ▶</span>
+                  <div className="text-right">
+                    <span className={`block font-mono-code text-lg font-bold ${s.price}`}>¥{t.price.toLocaleString()}</span>
+                    <span className={`block text-[11px] font-mono-code font-bold whitespace-nowrap ${best ? 'text-[#ffe100]' : 'text-[#cec6aa]'}`}>
+                      {best ? `ベスト ${best.score}` : '未挑戦'}
+                    </span>
                   </div>
                 </div>
               );

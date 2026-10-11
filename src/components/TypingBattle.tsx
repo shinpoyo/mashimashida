@@ -6,7 +6,6 @@ import { MODES, makeCalls, pick, QUESTIONS, DEFAULT_LV, type Call } from '../eng
 import { Typer, MultiTyper, type CallTyper } from '../engine/romaji';
 import { lotScore, judgeRank } from '../engine/scoring';
 import { soundManager } from '../utils/audio';
-import { VirtualKeyboard } from './VirtualKeyboard';
 import { BowlView, ChefPhoto, RamenPhoto, type ChefMood } from './JiroArt';
 import { RuleIntro } from './RuleIntro';
 
@@ -89,6 +88,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const timers = useRef<number[]>([]);
   const rafId = useRef<number>(0);
   const timerBar = useRef<HTMLDivElement>(null);
+  const timeLeftEl = useRef<HTMLSpanElement>(null);
 
   const later = (fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms));
@@ -163,6 +163,10 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     if (timerBar.current) {
       timerBar.current.style.width = `${ratio * 100}%`;
       timerBar.current.style.background = ratio < 0.35 ? '#ff5555' : '#ffe100';
+    }
+    if (timeLeftEl.current) {
+      timeLeftEl.current.textContent = `${Math.max(0, s.limit - el).toFixed(1)}秒`;
+      timeLeftEl.current.style.color = ratio < 0.35 ? '#ff5555' : '';
     }
     if (ratio <= 0) return timeout();
     // 残り時間わずか：拍子木で急かす（終盤ほど速く）
@@ -380,7 +384,11 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const rest = typer && !cfg.super ? typer.rest() : '';
   const kanaSrc = typer ? typer.src : '';
   const kanaDone = typer ? typer.kanaDone : 0;
-  const nextKey = phase === 'play' && !cfg.super ? rest.slice(0, 1) : '';
+  // プレイ中の正確率・打鍵速度（ロット中の経過時間も含める）
+  const totalKeys = s.keys + s.miss;
+  const liveAcc = totalKeys ? ((s.keys / totalKeys) * 100).toFixed(1) : '100.0';
+  const liveMs = s.typingMs + (phase === 'play' ? performance.now() - s.lotStart : 0);
+  const liveKps = liveMs > 0 ? (s.keys / (liveMs / 1000)).toFixed(2) : '0.00';
   const breaksLimit = rule.maxBreaks;
 
   if (phase === 'intro') {
@@ -472,7 +480,10 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
 
       {/* 店内：店主・吹き出し・提供カウンター（超ハードは出題の丼） */}
       <div className="flex items-center gap-3 bg-[#1c1b1b] border-2 border-[#353534] rounded-xl px-3 py-2">
-        <ChefPhoto mood={mood} className="w-14 h-14 rounded-full" ringClass="ring-2" />
+        <div className="flex flex-col items-center shrink-0">
+          <ChefPhoto mood={mood} className="w-14 h-14 rounded-full" ringClass="ring-2" />
+          <span className="mt-1 text-[9px] font-dela text-[#ffe100] leading-none">店主</span>
+        </div>
         <div
           key={bubbleKey}
           id="staffBubble"
@@ -567,8 +578,21 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
         </div>
       </div>
 
-      {/* 超ハードは答えを伏せるのでキーボードは出さない */}
-      {!cfg.super && <VirtualKeyboard nextKey={nextKey} />}
+      {/* プレイ中の情報（キーボードは出さない） */}
+      <div id="liveStats" className="grid grid-cols-5 gap-2">
+        {[
+          ['残り時間', <span key="t" ref={timeLeftEl}>-</span>, 'text-[#ffe100]'],
+          ['連続正解', `${s.chain}杯`, 'text-[#ffe100]'],
+          ['正確率', `${liveAcc}%`, 'text-[#ffffff]'],
+          ['打鍵/秒', liveKps, 'text-[#ffffff]'],
+          ['提供', `${s.served}/${cfg.lots}杯`, 'text-[#ffb3ae]'],
+        ].map(([label, value, color]) => (
+          <div key={label as string} className="bg-[#1c1b1b] border border-[#353534] rounded-lg py-2 text-center">
+            <span className="block text-[10px] font-bold text-[#cec6aa]">{label}</span>
+            <span className={`font-mono-code text-lg font-black ${color}`}>{value}</span>
+          </div>
+        ))}
+      </div>
 
       {/* カウントダウン */}
       {phase === 'countdown' && countdown > 0 && (

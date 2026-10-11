@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
-import { ChefPhoto } from './JiroArt';
+import { PlayerAvatar } from './PlayerAvatar';
+import type { PlayerAvatar as Avatar } from '../data/player';
 import { LogoMark } from './Logo';
 
 interface HeaderProps {
   currentScreen: ScreenType;
   onNavigate: (screen: ScreenType) => void;
   bowlsCleared: number;
+  playerName: string;
+  avatar: Avatar;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowlsCleared }) => {
+export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowlsCleared, playerName, avatar }) => {
   const [isMuted, setIsMuted] = useState(soundManager.getMuted());
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -114,14 +117,14 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           </button>
           <button
             type="button"
-            onClick={() => onNavigate('my-kitchen')}
+            onClick={() => onNavigate('regular-card')}
             className={`px-3 py-1.5 rounded transition-all whitespace-nowrap text-sm cursor-pointer ${
-              currentScreen === 'my-kitchen'
+              currentScreen === 'regular-card'
                 ? 'bg-[#ffe100] text-[#0e0e0e] font-dela shadow-[0_3px_0_#000000]'
                 : 'text-[#cec6aa] font-bold hover:bg-[#2a2a2a] hover:text-[#e5e2e1]'
             }`}
           >
-            マイ厨房
+            常連カード
           </button>
         </nav>
 
@@ -165,23 +168,20 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
             </button>
           </div>
 
-          {/* Ninniku speech balloon & User Avatar */}
-          <div className="flex items-center gap-2 pl-2 border-l border-[#353534]">
-            <div className="relative hidden md:block">
-              <div className="bg-[#3a3939] text-[#e5e2e1] border border-[#ffe100] px-2.5 py-1 rounded-lg text-xs font-dela shadow-[2px_2px_0_#000000] whitespace-nowrap">
-                ニンニク入れますか？
-                <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-2 h-2 bg-[#3a3939] border-t border-r border-[#ffe100] rotate-45" />
-              </div>
-            </div>
-            <div 
-              className="relative group cursor-pointer"
-              onClick={() => onNavigate('my-kitchen')}
-              title="マイ厨房を開く"
-            >
-              <ChefPhoto mood="normal" className="w-8 h-8 rounded-full" ringClass="ring-2" />
-              <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#970015] border border-[#0e0e0e] rounded-full" />
-            </div>
-          </div>
+          {/* プレイヤー（常連客）。店主とは別人なので、自分のアイコンと名前を表示 */}
+          <button
+            type="button"
+            id="playerChip"
+            className="flex items-center gap-2 pl-3 border-l border-[#353534] cursor-pointer group"
+            onClick={() => onNavigate('regular-card')}
+            title="常連カード（あなたのプロフィール）を開く"
+          >
+            <PlayerAvatar avatar={avatar} size={34} />
+            <span className="hidden md:flex flex-col items-start leading-tight">
+              <span className="text-[9px] text-[#cec6aa] font-bold">あなた（常連客）</span>
+              <span className="text-xs font-dela text-[#e5e2e1] group-hover:text-[#ffe100] max-w-[8rem] truncate">{playerName}</span>
+            </span>
+          </button>
         </div>
       </div>
 
@@ -212,12 +212,12 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           完飲番付
         </button>
         <button
-          onClick={() => onNavigate('my-kitchen')}
+          onClick={() => onNavigate('regular-card')}
           className={`px-2.5 py-1 text-xs rounded whitespace-nowrap cursor-pointer ${
-            currentScreen === 'my-kitchen' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
+            currentScreen === 'regular-card' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
           }`}
         >
-          マイ厨房
+          常連カード
         </button>
       </div>
     </header>
