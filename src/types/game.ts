@@ -1,22 +1,28 @@
 export type ScreenType = 'ticket-vending' | 'typing-battle' | 'call-master' | 'leaderboard' | 'my-kitchen';
 
-export type TicketDifficulty = 'sho' | 'dai' | 'buta' | 'insane';
+/** ゲームモード（mashimashityping の4モード） */
+export type GameMode = 'easy' | 'normal' | 'hard' | 'super';
+export type TicketDifficulty = GameMode;
 
 export interface TicketConfig {
-  id: TicketDifficulty;
+  id: GameMode;
   name: string;
   noddle: string;
   desc: string;
-  keystrokes: number;
-  timeLimit: number; // in seconds
   speedTarget: string;
   chefNote: string;
   price: number;
   badge: string;
-  badgeBg: string;
-  badgeColor: string;
-  strikesAllowed: number;
+  /** 札の色テーマ */
+  tone: 'yellow' | 'gold' | 'red' | 'black';
 }
+
+export type ToppingEffect =
+  | 'mistake_shield'
+  | 'time_extend'
+  | 'score_multiplier'
+  | 'combo_protect'
+  | 'break_forgive';
 
 export interface ToppingBuff {
   id: string;
@@ -24,39 +30,56 @@ export interface ToppingBuff {
   cost: number;
   desc: string;
   icon: string;
-  effectType: 'mistake_shield' | 'time_extend' | 'score_multiplier' | 'combo_protect' | 'fat_reduction';
+  effectType: ToppingEffect;
   effectValue: number;
 }
 
-export interface CallOption {
-  yasai: string;
-  garlic: string;
-  abura: string;
-  karame: string;
-}
+export type PenaltyId = 'none' | 'break3' | 'break1' | 'oni';
 
-export interface TypingPhrase {
-  id: string;
-  kanji: string;
-  kana: string;
-  romaji: string;
-  levelDesc: string;
-  slurpSound: string;
-  lore: string;
-}
-
-export interface LeaderboardEntry {
-  rank: number;
-  rankTitle: string;
+/** 退店ペナルティ（ゲーム開始前に選択） */
+export interface PenaltyRule {
+  id: PenaltyId;
   name: string;
-  title: string;
+  desc: string;
+  /** この回数ロット乱しで強制退店（null=無制限） */
+  maxBreaks: number | null;
+  /** この回数ミスタイプで強制退店（null=無制限） */
+  maxMisses: number | null;
+  /** スコア倍率（厳しいほど高い） */
+  scoreRate: number;
+}
+
+export interface GameSettings {
+  mode: GameMode;
+  toppings: string[];
+  penalty: PenaltyId;
+}
+
+export interface GameResult {
+  mode: GameMode;
+  toppings: string[];
+  penalty: PenaltyId;
+  score: number;
+  /** 打鍵/秒 */
+  kps: number;
   wpm: number;
+  /** 正確率（%） */
   accuracy: number;
-  clearTime: string;
-  strikes: number;
-  badgeStatus: string;
-  noddleSpec: string;
-  isUser?: boolean;
+  keys: number;
+  misses: number;
+  breaks: number;
+  fastestMs: number | null;
+  maxChain: number;
+  lotsServed: number;
+  lots: number;
+  rank: string;
+  rankComment: string;
+  /** 退店ペナルティで強制退店 */
+  expelled: boolean;
+  /** ギブアップ退店 */
+  gaveUp: boolean;
+  isBest: boolean;
+  durationSec: number;
 }
 
 export interface UserStats {
@@ -68,13 +91,16 @@ export interface UserStats {
   perfectClears: number;
   favoriteCall: string;
   title: string;
+  bestScores: Partial<Record<GameMode, { score: number; rank: string; date: string }>>;
   recentGames: {
     id: string;
-    mode: TicketDifficulty;
+    mode: GameMode;
     date: string;
     wpm: number;
     accuracy: number;
     time: string;
     cleared: boolean;
+    score?: number;
+    rank?: string;
   }[];
 }

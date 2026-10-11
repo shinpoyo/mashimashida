@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
+import { MasterFace, BowlView } from './JiroArt';
 
 interface CallMasterProps {
   onGoToLeaderboard: () => void;
@@ -312,22 +313,14 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => 
             {/* Chef portrait & ramen bowl preview */}
             <div className="flex items-center gap-4 pt-2">
               <div className="relative group">
-                <img
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoayYLQ4-AJXcGtoDZTQXxCvLqHXcKmfbX8h4YcoZF98070-rpN-9YHbkqGCk4E2yPQBNmbeUsdHyjPpmYTPPJBSw9XwIiDiGSrlSIdSOxG1Z4RYnmk6R3PMbqBgRHXiHXKn0NIhbQOKbljrnA6iK-M-np7oiW7_UUCPsvYonwArfGV1XtwTR_RV7EVS6Ig4CShy92LjHfiqm2RfozWFxs9JEMP2X-K6v_gJVJYaXRwyB_lhMtYHxS"
-                  alt="頑固店主・二郎魂"
-                  className="w-24 h-24 rounded-lg object-cover border-2 border-[#970015] shadow-lg"
-                />
+                <MasterFace mood="stern" className="w-24 h-24 rounded-lg overflow-hidden bg-[#2a2018] border-2 border-[#970015] shadow-lg" />
                 <span className="absolute bottom-1 left-1 bg-[#970015] text-[#ffdad7] text-[9px] font-dela px-1 rounded">
                   頑固店主・二郎魂
                 </span>
               </div>
 
               <div className="relative group">
-                <img
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOmwEvA5fk_Y6WaIrAIt5fbOmQglfgR1nPp_FjwH6YAjnAAPUA1Gy1l2tQZm2yS8k0nPTabgfJBlhp3wFEMLnvJSe22YXokcRf5GTpmHTaTJz0ctZJahNbEC-5CZ8-uKF7GTLxQhljLjLhADZmACURegEQYzw9ux5iXAoIAga8E4jXCiNgkUWwqWVEIO8Qrc1xl6t_rtG_GqaEULYEPXePpmoaXhWa07tXTioQPYxXOW7VOTjXXae-"
-                  alt="カウンター直撃"
-                  className="w-24 h-24 rounded-lg object-cover border-2 border-[#ffe100] shadow-lg"
-                />
+                <BowlView lv={{ yasai: 4, ninniku: 3, abura: 3, karame: 2 }} seed={7} className="w-24 h-24 rounded-lg overflow-hidden bg-[#1a1410] border-2 border-[#ffe100] shadow-lg" />
                 <span className="absolute bottom-1 left-1 bg-[#ffe100] text-[#0e0e0e] text-[9px] font-dela px-1 rounded">
                   カウンター直撃
                 </span>

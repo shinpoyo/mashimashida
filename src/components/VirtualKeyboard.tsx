@@ -2,14 +2,16 @@ import React from 'react';
 
 interface VirtualKeyboardProps {
   nextKey: string;
+  /** 超ハードなど答えを伏せるモード */
+  hidden?: boolean;
 }
 
-export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ nextKey }) => {
+export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ nextKey, hidden = false }) => {
   const row1 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
   const row2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
   const row3 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'SPACE'];
 
-  const target = nextKey.toUpperCase();
+  const target = hidden ? '' : nextKey.toUpperCase();
 
   const isKeyActive = (key: string) => {
     if (key === 'SPACE' && target === ' ') return true;
@@ -24,7 +26,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ nextKey }) => 
           リアルタイム打鍵アシスト・キーボード
         </span>
         <span className="font-mono-code font-bold text-xs tracking-wider">
-          NEXT KEY: <span className="text-[#ffe100] bg-[#353534] px-2 py-0.5 rounded border border-[#ffe100]">[ {target === ' ' ? 'SPACE' : target || 'END'} ]</span>
+          NEXT KEY: <span className="text-[#ffe100] bg-[#353534] px-2 py-0.5 rounded border border-[#ffe100]">[ {hidden ? '?' : target === ' ' ? 'SPACE' : target || '-'} ]</span>
         </span>
       </div>
 

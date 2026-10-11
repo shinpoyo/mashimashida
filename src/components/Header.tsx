@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
+import { MasterFace } from './JiroArt';
 
 interface HeaderProps {
   currentScreen: ScreenType;
@@ -64,11 +65,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           className="flex items-center gap-3 shrink-0 cursor-pointer select-none"
           onClick={() => onNavigate('ticket-vending')}
         >
-          <img
-            alt="Mashimashi Typer Signboard Logo"
-            className="h-8 w-auto object-contain"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7mE3QIN4dMeXBUa8mfES-I3PNWiP_gzywRS7vksnjcNceZY34lDa6CRzRPgV2372wc4_6vyDoMNhBf7-F4XwAy7LJ885iHVESDDVlsRfu4welL7qeNDLi1eXMRFJwdVdmu9hSTQH5DZUOFK-78HMR4eVLqe893WAW6hzpMtCv1c8EctfXn-Ysg0u5vP37nLlpcSHEF8oDN0gqI031Y53X9sBZo_xTTYk7b1uT3g8xdRy-7drmZd0L"
-          />
+          <MasterFace mood="normal" className="h-10 w-10 rounded-full overflow-hidden bg-[#2a2018] ring-2 ring-[#ffe100]" />
           <div className="flex flex-col">
             <span className="font-dela text-lg text-[#ffe100] tracking-wider leading-none drop-shadow-[2px_2px_0_#000000]">
               マシマシ打
@@ -191,11 +188,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
               onClick={() => onNavigate('my-kitchen')}
               title="マイ厨房を開く"
             >
-              <img
-                alt="Profile"
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-[#ffe100] shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoayYLQ4-AJXcGtoDZTQXxCvLqHXcKmfbX8h4YcoZF98070-rpN-9YHbkqGCk4E2yPQBNmbeUsdHyjPpmYTPPJBSw9XwIiDiGSrlSIdSOxG1Z4RYnmk6R3PMbqBgRHXiHXKn0NIhbQOKbljrnA6iK-M-np7oiW7_UUCPsvYonwArfGV1XtwTR_RV7EVS6Ig4CShy92LjHfiqm2RfozWFxs9JEMP2X-K6v_gJVJYaXRwyB_lhMtYHxS"
-              />
+              <MasterFace mood="wait" className="w-8 h-8 rounded-full overflow-hidden bg-[#2a2018] ring-2 ring-[#ffe100] shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
               <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#970015] border border-[#0e0e0e] rounded-full" />
             </div>
           </div>

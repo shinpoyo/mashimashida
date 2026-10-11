@@ -94,3 +94,63 @@
 .animate-rage {
   animation: rage-pulse 1.2s infinite ease-in-out;
 }
+
+/* ---------- SVG 丼・店主（mashimashityping から移植） ---------- */
+.jiro-bowl svg,
+.jiro-master svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.jiro-bowl .bowl {
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+}
+.bowl-steam {
+  animation: steamDrift 2.8s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+@keyframes steamDrift {
+  0% { transform: translateY(0) scaleX(1); opacity: 0.55; }
+  50% { transform: translateY(-10px) scaleX(1.12); opacity: 0.8; }
+  100% { transform: translateY(-22px) scaleX(0.88); opacity: 0.2; }
+}
+.master-svg.mood-normal { animation: masterBreathe 2.4s ease-in-out infinite alternate; }
+@keyframes masterBreathe {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+.master-svg.mood-success { animation: masterNod 0.5s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes masterNod {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px) scale(1.06); }
+  100% { transform: translateY(0); }
+}
+.master-svg.mood-stern { animation: masterAngry 0.4s ease; }
+@keyframes masterAngry {
+  0%, 100% { transform: none; }
+  25% { transform: translateX(-4px) rotate(-2deg); }
+  75% { transform: translateX(4px) rotate(2deg); }
+}
+
+.animate-serve { animation: serve 0.45s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes serve {
+  0% { transform: translateY(-30px) scale(0.85); }
+  100% { transform: none; }
+}
+.animate-pop { animation: pop 0.25s ease; }
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  70% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75em;
+  background: #2a2a2a;
+  border: 1px solid #353534;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0 0.35em;
+  color: #e5e2e1;
+}

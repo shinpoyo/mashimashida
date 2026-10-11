@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { UserStats, ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
+import { MasterFace } from './JiroArt';
+import { TICKET_CONFIGS } from '../data/shop';
 
 interface MyKitchenProps {
   userStats: UserStats;
@@ -29,11 +31,11 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
   };
 
   const badges = [
-    { id: 'b1', name: '完飲完食証', desc: '初めて標準麺量を最後まで完食した証', icon: 'ramen_dining', unlocked: userStats.bowlsCleared > 0 },
-    { id: 'b2', name: '神速コール', desc: 'コール道場で1.5秒以内の詠唱に成功', icon: 'bolt', unlocked: true },
-    { id: 'b3', name: '天地返しの達人', desc: 'タイピング修行で50コンボ以上の連打を達成', icon: 'sync', unlocked: userStats.maxWpm >= 300 },
-    { id: 'b4', name: '黒アブラ塊討伐者', desc: '上級以上の難易度でノーミス完食を達成', icon: 'shield', unlocked: userStats.perfectClears > 0 },
-    { id: 'b5', name: 'ロットの絶対神', desc: '最高速度400 WPM以上を叩き出した伝説の領域', icon: 'military_tech', unlocked: userStats.maxWpm >= 400 },
+    { id: 'b1', name: '完飲完食証', desc: '初めてロットを完走して完食した証', icon: 'ramen_dining', unlocked: userStats.bowlsCleared > 0 },
+    { id: 'b2', name: '全マシマシ制覇', desc: '全マシマシの食券で完飲完食', icon: 'bolt', unlocked: userStats.recentGames.some((g) => g.mode === 'hard' && g.cleared) || !!userStats.bestScores.hard },
+    { id: 'b3', name: '丼読みの達人', desc: '超ハード（画像出題）で完飲完食', icon: 'visibility', unlocked: userStats.recentGames.some((g) => g.mode === 'super' && g.cleared) || !!userStats.bestScores.super },
+    { id: 'b4', name: '黒アブラ塊討伐者', desc: 'ノーミス・ロット乱しゼロで完食', icon: 'shield', unlocked: userStats.perfectClears > 0 },
+    { id: 'b5', name: 'ロットの絶対神', desc: '称号「二郎神」を獲得した伝説の領域', icon: 'military_tech', unlocked: Object.values(userStats.bestScores).some((b) => b?.rank === '二郎神') },
   ];
 
   return (
@@ -42,13 +44,9 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
       <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-5 shadow-xl mb-6 flex flex-col md:flex-row items-center justify-between gap-5">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoayYLQ4-AJXcGtoDZTQXxCvLqHXcKmfbX8h4YcoZF98070-rpN-9YHbkqGCk4E2yPQBNmbeUsdHyjPpmYTPPJBSw9XwIiDiGSrlSIdSOxG1Z4RYnmk6R3PMbqBgRHXiHXKn0NIhbQOKbljrnA6iK-M-np7oiW7_UUCPsvYonwArfGV1XtwTR_RV7EVS6Ig4CShy92LjHfiqm2RfozWFxs9JEMP2X-K6v_gJVJYaXRwyB_lhMtYHxS"
-              alt="User Chef Profile"
-              className="w-20 h-20 rounded-full object-cover ring-4 ring-[#ffe100] shadow-xl"
-            />
+            <MasterFace mood="success" className="w-20 h-20 rounded-full overflow-hidden bg-[#2a2018] ring-4 ring-[#ffe100] shadow-xl" />
             <span className="absolute -bottom-1 -right-1 bg-[#ffe100] text-[#0e0e0e] text-[10px] font-dela px-1.5 py-0.5 rounded shadow">
-              LV.42
+              LV.{1 + Math.floor(userStats.bowlsCleared / 3)}
             </span>
           </div>
 
@@ -257,7 +255,7 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
                   {game.cleared ? '完食完飲' : 'ロット乱し'}
                 </span>
                 <span className="text-[#ffffff]">
-                  {game.mode === 'sho' ? '小ラーメン' : game.mode === 'dai' ? '大ラーメン' : game.mode === 'buta' ? '大豚ダブル' : '麺増し'}
+                  {TICKET_CONFIGS[game.mode]?.name ?? game.mode}
                 </span>
                 <span className="text-[11px] text-[#cec6aa] font-mono-code">{game.date}</span>
               </div>
