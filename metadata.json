@@ -1,6 +1,8 @@
 {
-  "name": "マシマシ打 - ラーメン二郎風タイピング格闘ゲーム",
-  "description": "背脂・ニンニク・カラメ・ヤサイ！打鍵速度で極太麺を啜り尽くすジロリアン専用タイピングコンバットゲーム。食券購入からコール道場、全国完飲番付まで完全再現。",
+  "name": "マシマシ打 - 山盛りラーメンのコール特化タイピングゲーム",
+  "description": "ヤサイ・ニンニク・アブラ・カラメ。店主の「ニンニク入れますか？」に、ローマ字で即答するタイピングゲーム。",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

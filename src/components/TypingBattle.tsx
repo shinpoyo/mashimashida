@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useReducer } from 'react';
 import confetti from 'canvas-confetti';
 import { GameResult, GameSettings } from '../types/game';
-import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_BY_ID, toppingValue } from '../data/shop';
+import { TICKET_CONFIGS, PENALTY_BY_ID } from '../data/shop';
 import { MODES, makeCalls, pick, QUESTIONS, DEFAULT_LV, type Call } from '../engine/calls';
 import { Typer, MultiTyper, type CallTyper } from '../engine/romaji';
 import { lotScore, judgeRank } from '../engine/scoring';
@@ -35,9 +35,6 @@ interface GameState {
   maxChain: number;
   score: number;
   served: number;
-  shields: number;
-  comboGuards: number;
-  forgives: number;
   startedAt: number;
 }
 
@@ -48,7 +45,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const ticket = TICKET_CONFIGS[settings.mode];
   const rule = PENALTY_BY_ID[settings.penalty];
   const scoreMult = rule.scoreRate;
-  const timeBonus = toppingValue(settings.toppings, 'time_extend');
 
   const newState = (): GameState => ({
     calls: makeCalls(cfg),
@@ -65,9 +61,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     maxChain: 0,
     score: 0,
     served: 0,
-    shields: toppingValue(settings.toppings, 'mistake_shield'),
-    comboGuards: toppingValue(settings.toppings, 'combo_protect'),
-    forgives: toppingValue(settings.toppings, 'break_forgive'),
     startedAt: performance.now(),
   });
 
@@ -124,7 +117,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       const { acc, kps, rank, comment } = judgeRank(cfg, { keys: s.keys, miss: s.miss, breaks: s.breaks, typingMs: s.typingMs });
       const res: GameResult = {
         mode: settings.mode,
-        toppings: settings.toppings,
         penalty: settings.penalty,
         score: s.score,
         kps,
@@ -190,10 +182,10 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     const call = s.calls[s.idx];
     if (cfg.super) {
       s.typer = new MultiTyper(call.answers!);
-      s.limit = cfg.base + cfg.perKey * new Typer(call.kana).rest().length + timeBonus;
+      s.limit = cfg.base + cfg.perKey * new Typer(call.kana).rest().length;
     } else {
       s.typer = new Typer(call.kana);
-      s.limit = cfg.base + cfg.perKey * s.typer.rest().length + timeBonus;
+      s.limit = cfg.base + cfg.perKey * s.typer.rest().length;
     }
     say(pick(QUESTIONS), 'normal');
     setCounter('cooking');
@@ -244,20 +236,9 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     setCardState('ng');
     const call = s.calls[s.idx];
     if (cfg.super) setRevealed(`正解：${call.display}`);
-    let note = '';
-    if (s.forgives > 0) {
-      s.forgives--;
-      note = '（黒烏龍茶で帳消し）';
-    } else {
-      s.breaks++;
-    }
-    if (s.comboGuards > 0 && s.chain > 0) {
-      s.comboGuards--;
-      note += '（生姜で連続正解キープ）';
-    } else {
-      s.chain = 0;
-    }
-    setVerdict(`ロット乱し！${note}`);
+    s.breaks++;
+    s.chain = 0;
+    setVerdict('ロット乱し！');
     setCounter('ng');
     say('ロットが乱れました…', 'stern');
     s.idx++;
@@ -282,13 +263,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     // ミスタイプ
     setShake(true);
     window.setTimeout(() => setShake(false), 250);
-    if (s.shields > 0) {
-      s.shields--;
-      setVerdict(`生卵バリア！ミス無効（残り${s.shields}）`);
-      soundManager.shield();
-      rerender();
-      return;
-    }
     s.miss++;
     soundManager.mistake();
     setVerdict('MISS…店主の眉が動いた');
@@ -410,13 +384,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const kanaSrc = typer ? typer.src : '';
   const kanaDone = typer ? typer.kanaDone : 0;
   const nextKey = phase === 'play' && !cfg.super ? rest.slice(0, 1) : '';
-  const activeBuffs = TOPPING_BUFFS.filter((b) => settings.toppings.includes(b.id));
-  const buffRemain: Record<string, string> = {
-    mistake_shield: `残り${s.shields}`,
-    combo_protect: `残り${s.comboGuards}`,
-    break_forgive: `残り${s.forgives}`,
-    time_extend: '発動中',
-  };
   const breaksLimit = rule.maxBreaks;
 
   if (phase === 'intro') {
@@ -433,7 +400,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
           <>打ち切ると丼が提供されます。残り時間が多いほど高得点です。</>,
           <>持ち時間（黄色のバー）を過ぎると<b className="text-[#ff5555]">ロット乱し</b>。ミスタイプは正確率と称号に響きます。</>,
         ];
-    const toppingNames = activeBuffs.map((b) => `${b.name}（${b.desc}）`);
     return (
       <RuleIntro
         eyebrow="タイピング修行"
@@ -453,7 +419,6 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
             note: rule.desc,
             tone: rule.maxBreaks !== null ? 'warn' : 'normal',
           },
-          { label: 'トッピング券', value: toppingNames.length ? toppingNames.join('・') : 'なし' },
           { label: '操作', value: 'Esc：一時休戦', note: '結果画面：Space もう一杯 / Enter 番付へ' },
         ]}
         startLabel="修行開始"
@@ -539,7 +504,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
             </div>
             <div className="flex flex-col flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-dela text-[#ffe100]">三田総本山直系・店主</span>
+                <span className="text-xs font-dela text-[#ffe100]">頑固店主</span>
                 <span className="text-[10px] font-mono-code text-[#ffb3ae] bg-[#0e0e0e] px-1.5 py-0.5 rounded border border-[#4c4732]">👁 凝視中</span>
               </div>
               <div key={bubbleKey} id="staffBubble" className="animate-pop mt-2 bg-[#201f1f] text-[#e5e2e1] p-2.5 rounded-lg border border-[#353534] text-base font-black leading-relaxed shadow">
@@ -595,14 +560,25 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
           </div>
 
           <div className="md:col-span-3 flex flex-col gap-1.5 text-xs font-bold bg-[#0e0e0e] p-3 rounded-lg border border-[#353534]">
-            <span className="text-[10px] text-[#cec6aa]">トッピング券</span>
-            {activeBuffs.length === 0 && <span className="text-[#4c4732]">なし（素ラーメン）</span>}
-            {activeBuffs.map((b) => (
-              <div key={b.id} className="flex justify-between items-center">
-                <span className="text-[#e5e2e1]">{b.name}</span>
-                <span className="font-mono-code text-[#ffe100]">{buffRemain[b.effectType]}</span>
-              </div>
-            ))}
+            <span className="text-[10px] text-[#cec6aa]">退店ペナルティ「{rule.name}」</span>
+            <div className="flex justify-between items-center">
+              <span className="text-[#e5e2e1]">ロット乱し</span>
+              <span className={`font-mono-code ${rule.maxBreaks !== null && s.breaks >= rule.maxBreaks - 1 ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
+                {s.breaks}
+                {rule.maxBreaks !== null ? ` / ${rule.maxBreaks}` : '回'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[#e5e2e1]">ミス</span>
+              <span className={`font-mono-code ${rule.maxMisses !== null && s.miss >= rule.maxMisses - 1 ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
+                {s.miss}
+                {rule.maxMisses !== null ? ` / ${rule.maxMisses}` : '回'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[#e5e2e1]">スコア倍率</span>
+              <span className="font-mono-code text-[#ffe100]">×{rule.scoreRate.toFixed(1)}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -622,7 +598,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
             <span className="font-dela text-sm sm:text-base text-[#e5e2e1]">{cfg.super ? 'この丼になるコールを答えよ' : 'あなたのコール'}</span>
           </div>
           <span className="font-dela text-xs text-[#ffe100] hidden sm:inline-block">
-            {cfg.super ? '順不同OK・全マシOK' : cfg.shuffle ? 'LEVEL: 順不同ジロリアン' : 'LEVEL: 定番コール'}
+            {cfg.super ? '順不同OK・全マシOK' : cfg.shuffle ? 'LEVEL: 順不同' : 'LEVEL: 定番コール'}
           </span>
         </div>
 

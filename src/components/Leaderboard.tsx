@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameResult, UserStats } from '../types/game';
-import { TICKET_CONFIGS, MODE_ORDER, PENALTY_BY_ID, TOPPING_BUFFS } from '../data/shop';
+import { TICKET_CONFIGS, MODE_ORDER, PENALTY_BY_ID } from '../data/shop';
 import { soundManager } from '../utils/audio';
 
 interface LeaderboardProps {
@@ -52,8 +52,6 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
             <div className="flex-1">
               <span className="text-[10px] text-[#cec6aa] font-bold block">
                 直近の一杯：{TICKET_CONFIGS[lastResult.mode].name} ／ ペナルティ「{PENALTY_BY_ID[lastResult.penalty].name}」
-                {lastResult.toppings.length > 0 &&
-                  ` ／ ${lastResult.toppings.map((id) => TOPPING_BUFFS.find((b) => b.id === id)?.name).filter(Boolean).join('・')}`}
               </span>
               <h2 className={`font-dela text-4xl tracking-wider drop-shadow-[2px_2px_0_#000] ${lastResult.expelled || lastResult.gaveUp ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
                 {lastResult.rank}

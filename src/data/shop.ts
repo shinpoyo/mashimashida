@@ -1,4 +1,4 @@
-import type { GameMode, PenaltyId, PenaltyRule, TicketConfig, ToppingBuff } from '../types/game';
+import type { GameMode, PenaltyId, PenaltyRule, TicketConfig } from '../types/game';
 
 /** 主食券（難易度）。ロット数・持ち時間などのゲーム設定は engine/calls.ts の MODES */
 export const TICKET_CONFIGS: Record<GameMode, TicketConfig> = {
@@ -28,7 +28,7 @@ export const TICKET_CONFIGS: Record<GameMode, TicketConfig> = {
     id: 'hard',
     name: '全マシマシ',
     noddle: '12ロット',
-    desc: 'ジロリアン向け / 順不同・時間激短',
+    desc: '猛者向け / 順不同・時間激短',
     speedTarget: '順不同',
     chefNote: 'チョモランマ襲来。迷えば即ロット乱し',
     price: 1150,
@@ -49,51 +49,6 @@ export const TICKET_CONFIGS: Record<GameMode, TicketConfig> = {
 };
 
 export const MODE_ORDER: GameMode[] = ['easy', 'normal', 'hard', 'super'];
-
-/** 追加トッピング小券（バフ）。ロット制のゲームに合わせて効果を再定義 */
-export const TOPPING_BUFFS: ToppingBuff[] = [
-  {
-    id: 'raw-egg',
-    name: '生卵',
-    cost: 50,
-    desc: 'ミス無効×3',
-    icon: 'egg',
-    effectType: 'mistake_shield',
-    effectValue: 3,
-  },
-  {
-    id: 'quail',
-    name: 'うずら5個',
-    cost: 100,
-    desc: '各ロット+1.5秒',
-    icon: 'radio_button_checked',
-    effectType: 'time_extend',
-    effectValue: 1.5,
-  },
-  {
-    id: 'ginger',
-    name: '生姜',
-    cost: 50,
-    desc: '連続正解を1回保護',
-    icon: 'spa',
-    effectType: 'combo_protect',
-    effectValue: 1,
-  },
-  {
-    id: 'tea',
-    name: '黒烏龍茶',
-    cost: 180,
-    desc: 'ロット乱し1回帳消し',
-    icon: 'local_cafe',
-    effectType: 'break_forgive',
-    effectValue: 1,
-  },
-];
-
-export function toppingValue(toppings: string[], effect: ToppingBuff['effectType']): number {
-  const t = TOPPING_BUFFS.find((b) => b.effectType === effect && toppings.includes(b.id));
-  return t ? t.effectValue : 0;
-}
 
 /** 退店ペナルティ（ゲーム開始前に選択） */
 export const PENALTY_RULES: PenaltyRule[] = [

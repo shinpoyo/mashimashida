@@ -30,7 +30,21 @@ const EMPTY_STATS: UserStats = {
   recentGames: [],
 };
 
-const DEFAULT_SETTINGS: GameSettings = { mode: 'easy', toppings: [], penalty: 'none' };
+/** 旧バージョンの称号名を現在の名称へ置き換える */
+const RANK_RENAMES: Record<string, string> = { ジロリアン見習い: '常連見習い', ジロリアン: 'ロット番長', 二郎神: '麺神' };
+function migrateStats(s: UserStats): UserStats {
+  const rn = (r?: string) => (r && RANK_RENAMES[r]) || r;
+  const bestScores: UserStats['bestScores'] = {};
+  for (const [m, b] of Object.entries(s.bestScores ?? {})) if (b) bestScores[m as keyof typeof bestScores] = { ...b, rank: rn(b.rank)! };
+  return {
+    ...s,
+    title: Object.entries(RANK_RENAMES).reduce((t, [a, b]) => t.replace(a, b), s.title),
+    bestScores,
+    recentGames: (s.recentGames ?? []).map((g) => ({ ...g, rank: rn(g.rank) })),
+  };
+}
+
+const DEFAULT_SETTINGS: GameSettings = { mode: 'easy', penalty: 'none' };
 
 function load<T>(key: string, fallback: T): T {
   try {
@@ -52,12 +66,16 @@ function save(key: string, value: unknown) {
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('ticket-vending');
-  const [settings, setSettings] = useState<GameSettings>(() => load(SETTINGS_KEY, DEFAULT_SETTINGS));
+  const [settings, setSettings] = useState<GameSettings>(() => {
+    // 旧バージョンの保存設定（トッピング券など）は必要な項目だけ取り出す
+    const s = load(SETTINGS_KEY, DEFAULT_SETTINGS);
+    return { mode: s.mode, penalty: s.penalty };
+  });
   /** 同じ設定で再挑戦したときも TypingBattle を作り直すためのキー */
   const [battleKey, setBattleKey] = useState<number>(0);
   const [lastResult, setLastResult] = useState<GameResult | null>(null);
 
-  const [userStats, setUserStats] = useState<UserStats>(() => load(STATS_KEY, EMPTY_STATS));
+  const [userStats, setUserStats] = useState<UserStats>(() => migrateStats(load(STATS_KEY, EMPTY_STATS)));
   const statsRef = useRef(userStats);
   statsRef.current = userStats;
 

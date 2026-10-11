@@ -55,7 +55,7 @@ export const RuleIntro: React.FC<RuleIntroProps> = ({ eyebrow, title, chefLine, 
     <div id="ruleIntro" className="flex flex-col w-full pb-16 gap-6">
       {/* 店主の前置き */}
       <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl overflow-hidden shadow-xl">
-        <div className="relative h-40 sm:h-48">
+        <div className="relative h-36 sm:h-40">
           <RamenPhoto className="absolute inset-0 w-full h-full" position="50% 45%" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0e0e0e] via-[#0e0e0e]/80 to-transparent" />
           <div className="relative h-full flex items-center gap-4 px-5">
@@ -67,6 +67,26 @@ export const RuleIntro: React.FC<RuleIntroProps> = ({ eyebrow, title, chefLine, 
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 開始ボタン：画面を開いてすぐ見える位置 */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          type="button"
+          id="ruleStartBtn"
+          onClick={onStart}
+          className="flex-1 py-4 px-6 rounded-xl bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-lg tracking-wider shadow-hard-lg active:translate-y-1 transition-all flex items-center justify-center gap-3 cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-2xl">sports_kabaddi</span>
+          {startLabel}（Enter / Space）
+        </button>
+        <button
+          type="button"
+          onClick={onBack}
+          className="py-4 px-6 rounded-xl bg-[#2a2a2a] hover:bg-[#353534] text-[#cec6aa] font-dela text-sm cursor-pointer"
+        >
+          {backLabel}（Esc）
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
@@ -111,24 +131,6 @@ export const RuleIntro: React.FC<RuleIntroProps> = ({ eyebrow, title, chefLine, 
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <button
-          type="button"
-          id="ruleStartBtn"
-          onClick={onStart}
-          className="flex-1 py-4 px-6 rounded-xl bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-lg tracking-wider shadow-hard-lg active:translate-y-1 transition-all flex items-center justify-center gap-3 cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-2xl">sports_kabaddi</span>
-          {startLabel}（Enter / Space）
-        </button>
-        <button
-          type="button"
-          onClick={onBack}
-          className="py-4 px-6 rounded-xl bg-[#2a2a2a] hover:bg-[#353534] text-[#cec6aa] font-dela text-sm cursor-pointer"
-        >
-          {backLabel}（Esc）
-        </button>
-      </div>
     </div>
   );
 };

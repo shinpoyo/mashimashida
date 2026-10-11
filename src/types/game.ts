@@ -17,22 +17,6 @@ export interface TicketConfig {
   tone: 'yellow' | 'gold' | 'red' | 'black';
 }
 
-export type ToppingEffect =
-  | 'mistake_shield'
-  | 'time_extend'
-  | 'combo_protect'
-  | 'break_forgive';
-
-export interface ToppingBuff {
-  id: string;
-  name: string;
-  cost: number;
-  desc: string;
-  icon: string;
-  effectType: ToppingEffect;
-  effectValue: number;
-}
-
 export type PenaltyId = 'none' | 'break3' | 'break1' | 'oni';
 
 /** 退店ペナルティ（ゲーム開始前に選択） */
@@ -50,13 +34,11 @@ export interface PenaltyRule {
 
 export interface GameSettings {
   mode: GameMode;
-  toppings: string[];
   penalty: PenaltyId;
 }
 
 export interface GameResult {
   mode: GameMode;
-  toppings: string[];
   penalty: PenaltyId;
   score: number;
   /** 打鍵/秒 */

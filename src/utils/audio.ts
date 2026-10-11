@@ -260,14 +260,6 @@ class SoundManager {
     this.noise(t, 0.05, { vol: 0.6, filter: 'lowpass', freq: 500 });
   }
 
-  /** 生卵バリアでミス無効：弾む「ぽよん」 */
-  public shield() {
-    const t = this.ready();
-    if (t === null) return;
-    this.tone(520, t, 0.14, { type: 'sine', vol: 0.5, glideTo: 1040, wet: 0.2 });
-    this.tone(1560, t + 0.06, 0.18, { type: 'triangle', vol: 0.18, wet: 0.3 });
-  }
-
   /** 食券ボタン：券売機の「ピッ」 */
   public ticketSelect() {
     const t = this.ready();

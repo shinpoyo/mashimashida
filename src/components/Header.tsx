@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
-import { ChefPhoto, logoImg } from './JiroArt';
+import { ChefPhoto } from './JiroArt';
+import { LogoMark } from './Logo';
 
 interface HeaderProps {
   currentScreen: ScreenType;
@@ -51,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           </span>
           <div className="flex items-center gap-4">
             <span className="hidden sm:inline-block text-[10px] bg-[#0e0e0e] text-[#ffe100] px-2 py-0.5 rounded font-dela tracking-wider">
-              JIRO-TYPING LEAGUE
+              MASHIMASHI TYPING LEAGUE
             </span>
             <span className="text-[11px] font-bold">本日の営業: 昼の部 炎上中</span>
           </div>
@@ -65,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           className="flex items-center gap-3 shrink-0 cursor-pointer select-none"
           onClick={() => onNavigate('ticket-vending')}
         >
-          <img alt="マシマシ打 看板ロゴ" className="h-9 w-auto object-contain rounded-sm" src={logoImg} draggable={false} />
+          <LogoMark className="h-11 w-11 drop-shadow-[2px_2px_0_#000]" />
           <div className="flex flex-col">
             <span className="font-dela text-lg text-[#ffe100] tracking-wider leading-none drop-shadow-[2px_2px_0_#000000]">
               マシマシ打

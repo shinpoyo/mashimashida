@@ -16,8 +16,6 @@
     "@types/canvas-confetti": "^1.9.0",
     "@vitejs/plugin-react": "^6.1.1",
     "canvas-confetti": "^1.9.4",
-    "lucide-react": "^0.546.0",
-    "motion": "^12.23.24",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "vite": "^8.3.0"
@@ -30,5 +28,5 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   },
-  "description": "マシマシ打 - ラーメン二郎風コール特化タイピングゲーム"
+  "description": "マシマシ打 - 山盛りラーメンのコール特化タイピングゲーム"
 }

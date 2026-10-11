@@ -35,7 +35,7 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
     { id: 'b2', name: '全マシマシ制覇', desc: '全マシマシの食券で完飲完食', icon: 'bolt', unlocked: userStats.recentGames.some((g) => g.mode === 'hard' && g.cleared) || !!userStats.bestScores.hard },
     { id: 'b3', name: '丼読みの達人', desc: '超ハード（画像出題）で完飲完食', icon: 'visibility', unlocked: userStats.recentGames.some((g) => g.mode === 'super' && g.cleared) || !!userStats.bestScores.super },
     { id: 'b4', name: '黒アブラ塊討伐者', desc: 'ノーミス・ロット乱しゼロで完食', icon: 'shield', unlocked: userStats.perfectClears > 0 },
-    { id: 'b5', name: 'ロットの絶対神', desc: '称号「二郎神」を獲得した伝説の領域', icon: 'military_tech', unlocked: Object.values(userStats.bestScores).some((b) => b?.rank === '二郎神') },
+    { id: 'b5', name: 'ロットの絶対神', desc: '称号「麺神」を獲得した伝説の領域', icon: 'military_tech', unlocked: Object.values(userStats.bestScores).some((b) => b?.rank === '麺神') },
   ];
 
   return (
@@ -55,9 +55,9 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
               <span className="text-[10px] font-mono-code bg-[#0e0e0e] text-[#ffe100] px-2 py-0.5 rounded font-bold border border-[#ffe100]">
                 {userStats.title}
               </span>
-              <span className="text-xs text-[#cec6aa] font-bold">三田総本山 認定門下生</span>
+              <span className="text-xs text-[#cec6aa] font-bold">マシマシ打 認定門下生</span>
             </div>
-            <h1 className="font-dela text-2xl text-[#ffffff] mt-1">旅のジロリアン (YOU)</h1>
+            <h1 className="font-dela text-2xl text-[#ffffff] mt-1">旅の常連客 (YOU)</h1>
             <p className="text-xs text-[#cec6aa] font-bold mt-0.5">
               通算完飲: <strong className="text-[#ffe100] font-mono-code text-sm">{userStats.bowlsCleared}杯</strong> / 撃沈: {userStats.strikesCount}回
             </p>

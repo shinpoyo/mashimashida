@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, GameSettings, PenaltyId, UserStats } from '../types/game';
-import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER } from '../data/shop';
+import { TICKET_CONFIGS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER } from '../data/shop';
 import { MODES } from '../engine/calls';
 import { soundManager } from '../utils/audio';
-import { RamenPhoto } from './JiroArt';
+import { TicketPhoto } from './JiroArt';
 
 interface TicketVendingProps {
   initialSettings: GameSettings;
@@ -20,10 +20,6 @@ const TONE_STYLES = {
 
 export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, bestScores, onStartGame }) => {
   const [selectedMode, setSelectedMode] = useState<GameMode>(initialSettings.mode);
-  const [activeToppings, setActiveToppings] = useState<Set<string>>(
-    // 廃止された券（魚粉など）が保存設定に残っていても無視する
-    new Set(initialSettings.toppings.filter((id) => TOPPING_BUFFS.some((b) => b.id === id))),
-  );
   const [penalty, setPenalty] = useState<PenaltyId>(initialSettings.penalty);
   const [issuedMessage, setIssuedMessage] = useState<string>(`${TICKET_CONFIGS[initialSettings.mode].name} を選択中`);
   const [showIssuedBadge, setShowIssuedBadge] = useState<boolean>(false);
@@ -31,9 +27,6 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
   const currentConfig = TICKET_CONFIGS[selectedMode];
   const mode = MODES[selectedMode];
   const rule = PENALTY_BY_ID[penalty];
-
-  // スコア倍率は退店ペナルティで決まる（トッピング券では上がらない）
-  const scoreMult = rule.scoreRate;
 
   const handleSelectMode = (m: GameMode) => {
     setSelectedMode(m);
@@ -44,19 +37,9 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
     setTimeout(() => setShowIssuedBadge(false), 2200);
   };
 
-  const toggleTopping = (topId: string) => {
-    soundManager.uiClick();
-    setActiveToppings((prev) => {
-      const next = new Set(prev);
-      if (next.has(topId)) next.delete(topId);
-      else next.add(topId);
-      return next;
-    });
-  };
-
   const handleStart = () => {
     soundManager.ticketIssue();
-    onStartGame({ mode: selectedMode, toppings: Array.from(activeToppings), penalty });
+    onStartGame({ mode: selectedMode, penalty });
   };
 
   // キーボード: 1〜4 で食券選択、Enter で着席
@@ -75,29 +58,41 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedMode, activeToppings, penalty]);
+  }, [selectedMode, penalty]);
 
   return (
     <div className="flex flex-col w-full pb-16">
-      {/* Top Marquee & Shop Announcement Strip */}
-      <div className="w-full bg-[#0e0e0e] rounded-xl p-3 shadow-md mb-6 flex flex-col md:flex-row items-center justify-between gap-3 border border-[#353534]">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center justify-center bg-[#970015] text-[#ffdad7] px-2.5 py-1 rounded text-xs font-dela tracking-wider uppercase animate-pulse">
-            営業中
-          </span>
-          <span className="font-dela text-base sm:text-lg text-[#ffe100]">二郎直系 総本山タイピング道場</span>
+      {/* 開始バー：画面を開いてすぐ見える位置に置く */}
+      <div
+        id="startBar"
+        className="w-full bg-[#1c1b1b] rounded-xl p-3 sm:p-4 shadow-hard-lg mb-6 flex flex-col md:flex-row items-stretch md:items-center gap-4 border-2 border-[#ffe100]"
+      >
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <TicketPhoto mode={selectedMode} className="w-20 h-14 rounded-lg border border-[#353534] shrink-0" />
+          <div className="min-w-0">
+            <span className="text-[10px] text-[#cec6aa] font-bold block">選択中の食券</span>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="font-dela text-xl text-[#ffe100] leading-tight">{currentConfig.name}</span>
+              <span className="text-xs font-bold text-[#e5e2e1]">
+                {mode.lots}ロット ／ 退店ペナルティ「{rule.name}」 ／ スコア×{rule.scoreRate.toFixed(1)}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-4 text-xs font-mono-code text-[#cec6aa]">
-          <span className="text-[#cec6aa] font-bold">
-            キー <kbd className="kbd">1</kbd>〜<kbd className="kbd">4</kbd> で食券選択 / <kbd className="kbd">Enter</kbd> で着席
-          </span>
-        </div>
+        <button
+          onClick={handleStart}
+          type="button"
+          id="startBtn"
+          className="group shrink-0 py-3.5 px-6 rounded-xl bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-lg tracking-wider transition-all duration-150 shadow-hard-lg active:translate-y-1 flex items-center justify-center gap-3 cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-2xl group-hover:animate-bounce">sports_kabaddi</span>
+          <span>着席して修行開始（Enter）</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* LEFT VENDING MACHINE CONSOLE (7 Cols) */}
         <div className="lg:col-span-7 flex flex-col gap-5 bg-[#1c1b1b] rounded-xl p-4 sm:p-5 shadow-xl border-2 border-[#353534] relative overflow-hidden">
-          {/* Vending Plate Header Badge */}
           <div className="bg-[#353534] rounded-lg p-3 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[#ffe100] text-2xl">confirmation_number</span>
@@ -106,9 +101,11 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
                 <span className="font-mono-code text-[10px] text-[#cec6aa] tracking-widest font-bold">AUTOMATIC TICKET VENDING SYSTEM</span>
               </div>
             </div>
+            <span className="text-[11px] font-bold text-[#cec6aa] hidden sm:inline">
+              キー <kbd className="kbd">1</kbd>〜<kbd className="kbd">4</kbd> で選択
+            </span>
           </div>
 
-          {/* Main Course Selection */}
           <div className="flex items-center justify-between pt-1">
             <span className="font-bold text-xs text-[#cec6aa] uppercase tracking-wider flex items-center gap-1.5">
               <span className="w-1.5 h-3 bg-[#ffe100] rounded-xs inline-block" />
@@ -151,39 +148,8 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
             })}
           </div>
 
-          {/* Topping Tickets */}
-          <div className="flex items-center justify-between pt-2">
-            <span className="font-bold text-xs text-[#cec6aa] uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-1.5 h-3 bg-[#ffb3ae] rounded-xs inline-block" />
-              追加トッピング小券（バフ・特殊効果）
-            </span>
-            <span className="text-[10px] font-bold text-[#cec6aa] font-mono-code">複数選択可</span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {TOPPING_BUFFS.map((top) => {
-              const active = activeToppings.has(top.id);
-              return (
-                <button
-                  key={top.id}
-                  data-topping={top.id}
-                  onClick={() => toggleTopping(top.id)}
-                  type="button"
-                  className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all shadow-sm active:scale-95 text-center cursor-pointer border ${
-                    active ? 'bg-[#ffe100] text-[#0e0e0e] border-[#ffe100] font-black' : 'bg-[#201f1f] text-[#e5e2e1] border-[#353534] hover:bg-[#2a2a2a]'
-                  }`}
-                >
-                  <span className={`material-symbols-outlined text-xl ${active ? 'text-[#0e0e0e]' : 'text-[#ffe100]'}`}>{top.icon}</span>
-                  <span className="font-dela text-xs mt-1">{top.name}</span>
-                  <span className={`text-[10px] font-mono-code font-bold ${active ? 'text-[#211c00]' : 'text-[#ffe100]'}`}>+¥{top.cost}</span>
-                  <span className={`text-[10px] font-bold leading-tight ${active ? 'text-[#211c00]' : 'text-[#cec6aa]'}`}>{top.desc}</span>
-                </button>
-              );
-            })}
-          </div>
-
           {/* Ticket Dispenser Tray */}
-          <div className="mt-2 bg-[#0e0e0e] rounded-lg p-3 shadow-inner flex items-center justify-between border border-[#353534]">
+          <div className="bg-[#0e0e0e] rounded-lg p-3 shadow-inner flex items-center justify-between border border-[#353534]">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded bg-[#201f1f] flex items-center justify-center text-[#ffe100] shadow-sm">
                 <span className="material-symbols-outlined">receipt_long</span>
@@ -199,7 +165,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
           </div>
         </div>
 
-        {/* RIGHT: BOWL PREVIEW, PENALTY & START */}
+        {/* RIGHT: BOWL PREVIEW & PENALTY */}
         <div className="lg:col-span-5 flex flex-col gap-5">
           <div className="bg-[#1c1b1b] rounded-xl p-5 shadow-xl flex flex-col gap-4 border-2 border-[#353534]">
             <div className="flex items-center justify-between pb-2 border-b border-[#353534]">
@@ -212,10 +178,10 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
               </span>
             </div>
 
-            {/* Ramen Image Container */}
+            {/* 食券ごとのラーメン写真 */}
             <div className="relative w-full h-52 sm:h-56 rounded-xl overflow-hidden shadow-md group border border-[#353534]">
-              <RamenPhoto className="w-full h-full group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-90" />
+              <TicketPhoto key={selectedMode} mode={selectedMode} className="w-full h-full animate-fade-in" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-90 pointer-events-none" />
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-[#0e0e0e]/90 backdrop-blur-sm p-2.5 rounded-lg border border-[#353534]">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#ffb3ae] text-lg">psychology_alt</span>
@@ -237,7 +203,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
               </div>
               <div className="bg-[#201f1f] p-2.5 rounded-lg text-center shadow-sm border border-[#353534]">
                 <span className="text-[10px] text-[#cec6aa] block font-bold">スコア倍率</span>
-                <span className="font-mono-code text-lg text-[#ffe100] font-black">×{scoreMult.toFixed(2)}</span>
+                <span className="font-mono-code text-lg text-[#ffe100] font-black">×{rule.scoreRate.toFixed(2)}</span>
               </div>
             </div>
 
@@ -272,23 +238,8 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
                   );
                 })}
               </div>
-              <p className="text-[10px] text-[#cec6aa] font-bold">※厳しいほどスコア倍率アップ（現在 ×{rule.scoreRate.toFixed(1)}）</p>
+              <p className="text-[10px] text-[#cec6aa] font-bold">※厳しいほどスコア倍率アップ。IME はオフ（半角英数）にしてください。</p>
             </div>
-
-            <button
-              onClick={handleStart}
-              type="button"
-              id="startBtn"
-              className="group mt-2 w-full py-4 px-6 rounded-xl bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-lg text-center tracking-wider transition-all duration-150 shadow-hard-lg active:translate-y-1 flex items-center justify-center gap-3 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-2xl group-hover:animate-bounce">sports_kabaddi</span>
-              <span>食券を握りしめて着席！修行開始</span>
-              <span className="material-symbols-outlined text-2xl">arrow_forward</span>
-            </button>
-
-            <p className="text-center text-[11px] font-bold text-[#cec6aa]">
-              ※Enterキーでも入店できます。IMEはオフ（半角英数）にしてください。
-            </p>
           </div>
 
           {/* Glossary */}

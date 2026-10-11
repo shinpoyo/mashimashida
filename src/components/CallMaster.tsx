@@ -40,7 +40,6 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBac
   const [isAnswering, setIsAnswering] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isFailed, setIsFailed] = useState<boolean>(false);
-  const [isListeningMic, setIsListeningMic] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Compute Romaji and display text from current selection
@@ -224,52 +223,7 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBac
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleResetCall, started]);
 
-  // Voice Recognition support
-  const handleToggleMic = () => {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('お使いのブラウザは音声認識に対応していません。キーボード入力でお楽しみください。');
-      return;
-    }
 
-    try {
-      // @ts-expect-error SpeechRecognition class
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'ja-JP';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-
-      recognition.onstart = () => {
-        setIsListeningMic(true);
-        soundManager.playKeyStroke();
-      };
-
-      recognition.onresult = (event: unknown) => {
-        setIsListeningMic(false);
-        // @ts-expect-error SpeechRecognition event
-        const transcript = event.results[0][0].transcript;
-        if (transcript) {
-          // If transcript has keywords
-          setTypedChars(targetRomaji);
-          soundManager.playCriticalHit();
-          setIsSuccess(true);
-          setIsAnswering(false);
-        }
-      };
-
-      recognition.onerror = () => {
-        setIsListeningMic(false);
-      };
-
-      recognition.onend = () => {
-        setIsListeningMic(false);
-      };
-
-      recognition.start();
-    } catch {
-      setIsListeningMic(false);
-    }
-  };
 
   // Stack calculation for vertical bars
   const getYasaiHeight = () => (callSelection.yasai === 'マシマシ' ? '85%' : callSelection.yasai === 'マシ' ? '60%' : callSelection.yasai === '少なめ' ? '30%' : '10%');
@@ -321,7 +275,6 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBac
           </span>
         </div>
         <div className="flex items-center gap-4 text-xs font-mono-code font-bold">
-          <span className="text-[#cec6aa]">FPS: 60 | LATENCY: 12ms</span>
           <span className="px-2.5 py-1 bg-[#ffe100] text-[#0e0e0e] font-dela text-xs rounded shadow">
             CALL MASTER MODE
           </span>
@@ -354,7 +307,7 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBac
               <div className="relative group">
                 <ChefPhoto mood="stern" className="w-24 h-24 rounded-lg" ringClass="ring-2" />
                 <span className="absolute bottom-1 left-1 bg-[#970015] text-[#ffdad7] text-[9px] font-dela px-1 rounded">
-                  頑固店主・二郎魂
+                  頑固店主
                 </span>
               </div>
 
@@ -445,7 +398,7 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBac
               SPELL #{String(spellIndex).padStart(2, '0')}
             </span>
             <span className="font-mono-code text-xs text-[#cec6aa] font-bold">
-              JIRO_HIGH_SPEED_VOCAL_RECEPTOR
+              CALL TRAINING
             </span>
           </div>
           <div className="flex items-center gap-3 font-mono-code text-xs font-bold">
@@ -539,16 +492,6 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBac
               className="px-5 py-3 bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-sm rounded-xl shadow-hard-sm cursor-pointer whitespace-nowrap active:translate-y-0.5"
             >
               即答叫喚
-            </button>
-            <button
-              type="button"
-              onClick={handleToggleMic}
-              title="マイク入力で叫ぶ"
-              className={`px-3 py-3 rounded-xl border border-[#353534] font-dela text-sm cursor-pointer ${
-                isListeningMic ? 'bg-[#970015] text-[#ffdad7] animate-pulse' : 'bg-[#2a2a2a] text-[#cec6aa] hover:bg-[#353534]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-lg">mic</span>
             </button>
           </div>
 
@@ -784,12 +727,8 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBac
             className="w-full sm:w-auto px-6 py-3 bg-[#2a2a2a] hover:bg-[#353534] text-[#e5e2e1] font-dela text-sm rounded-xl cursor-pointer flex items-center justify-center gap-2 border border-[#353534]"
           >
             <span className="material-symbols-outlined text-lg">leaderboard</span>
-            全国コール番付へ記録送信
+            完飲番付を見る
           </button>
-          <span className="text-xs text-[#cec6aa] font-bold flex items-center gap-1.5 sm:ml-auto">
-            <span className="material-symbols-outlined text-sm text-[#ffe100]">info</span>
-            音声認識コール（マイク入力モード）は道場にて解禁・マイクでも叫べます！
-          </span>
         </div>
       </div>
     </div>
