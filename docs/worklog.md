@@ -381,3 +381,14 @@
   - 画像：プレイ画面・食券購入・結果（2倍解像度で撮影）、URL カード
 - 見本ページ（A 動画／B 画像1枚／C 画像4枚、投稿文のコピーボタン付き）を Artifact で作成：https://claude.ai/artifact/14RQLwNjuB9me2iFEN9rdQ
 - [promotion.md](promotion.md) に素材一覧と案ごとの添付を追記
+
+## 2026-10-11 広告（Google AdSense）の準備
+
+- 方針（ユーザー決定）：Google AdSense。場所は食券購入の下部・完飲番付・常連カード・個人サイトのトップ・結果画面の近く
+  - 結果画面はタイピング修行のポップアップ内に出るため、AdSense のポリシー（ポップアップ内の広告禁止）に合わせて置かない。結果から `Enter` で移る完飲番付の広告で代わりにする
+- `src/components/AdSlot.tsx`：ビルド時の `VITE_ADSENSE_CLIENT` / `VITE_ADSENSE_SLOT` が両方あるときだけ広告枠を出し、AdSense のスクリプトを1回だけ読み込む。未設定ならビルド結果に広告コードが入らない
+- 食券購入・完飲番付・常連カードの末尾に広告枠を配置
+- `deploy-pages.yml`：リポジトリの Actions 変数 `ADSENSE_CLIENT` / `ADSENSE_SLOT` をビルドに渡す
+- フッターにプライバシーポリシー（https://shinpoyo.com/privacy/ 、shinpoyo.github.io リポジトリで作成）へのリンク
+- 確認：型チェック・テスト 18 件・ビルド OK。ID 未設定のビルドに広告コードなし。ダミー ID のビルドで 3 画面に枠が出て、ポップアップ内は 0、スクリプト読み込み 1 回、JS エラーなし
+- compliance.md・security.md を広告導入に合わせて更新。手順は shinpoyo.github.io の `docs/adsense.md`

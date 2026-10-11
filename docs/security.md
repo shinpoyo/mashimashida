@@ -21,7 +21,7 @@
 | 登録者情報の公開 | 氏名・住所・電話・メールは `DATA REDACTED`（非公開）。**国（JP）と都道府県は公開**される（Cloudflare の仕様で、隠す設定はない） | ✅（都道府県のみ公開） |
 | Cloudflare / GitHub | DNS は「DNS only」。Cloudflare アカウントは2要素認証を設定済み | ✅ |
 | 機密情報 | 両リポジトリの全ファイル・履歴に API キー・パスワード・秘密鍵なし | ✅ |
-| 個人情報 | コミットの作成者メールは noreply のみ。プレイ記録・名前・アイコン画像は端末の localStorage のみで外部送信なし | ✅ |
+| 個人情報 | コミットの作成者メールは noreply のみ。プレイ記録・名前・アイコン画像は端末の localStorage のみで外部送信なし（広告を有効にすると Google への外部送信あり。プライバシーポリシーで開示） | ✅ |
 | 依存ライブラリ | `bun audit`：既知の脆弱性 0 件（114 パッケージ） | ✅ |
 | XSS | ユーザーが入力する名前は React が自動でエスケープ。`dangerouslySetInnerHTML` は丼の SVG（内部の数値だけで生成）の 1 か所のみで、外部入力は入らない。`eval` 等なし | ✅ |
 | 外部リンク | X 共有は `noopener` 付きで開き、本文・URL は `encodeURIComponent` 済み | ✅ |

@@ -1,4 +1,5 @@
 import React from 'react';
+import { AdSlot } from './AdSlot';
 import { GameResult, UserStats } from '../types/game';
 import { TICKET_CONFIGS, MODE_ORDER, PENALTY_BY_ID } from '../data/shop';
 import { soundManager } from '../utils/audio';
@@ -210,6 +211,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
           </p>
         </div>
       </div>
+      <AdSlot className="mt-8" />
     </div>
   );
 };

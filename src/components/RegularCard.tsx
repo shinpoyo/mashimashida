@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AdSlot } from './AdSlot';
 import { UserStats, ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
 import { PlayerAvatar } from './PlayerAvatar';
@@ -368,6 +369,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
           ))}
         </div>
       </div>
+      <AdSlot className="mt-8" />
     </div>
   );
 };

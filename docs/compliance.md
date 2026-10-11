@@ -35,7 +35,7 @@
 
 - **ライブラリのライセンス**：react / react-dom / vite / tailwindcss / @vitejs/plugin-react（MIT）、canvas-confetti（ISC）、typescript（Apache-2.0）。いずれも商用利用可能。配布時にライセンス表記を同梱すれば足りる
 - **フォント**：Dela Gothic One / M PLUS 1p / JetBrains Mono（SIL Open Font License）、Material Symbols（Apache-2.0）。Web フォントとしての利用に制限なし
-- **個人情報**：記録は端末の localStorage のみ。サーバー送信・解析タグ・Cookie なし
+- **個人情報**：記録は端末の localStorage のみ。サーバー送信・解析タグなし。広告（Google AdSense）を有効にすると広告 Cookie と Google への外部送信が発生する → プライバシーポリシー（https://shinpoyo.com/privacy/）で開示（2026-10-11 追記）
 - **一般名詞・慣用句**：「ヤサイ・ニンニク・アブラ・カラメ」「マシマシ」「ニンニク入れますか？」「ロット」「チョモランマ」はラーメン店で広く使われる言い回しで、特定の権利者の表示には当たらないと判断
 - **SNS 共有**：X（旧 Twitter）の共有用 URL（intent）を開くだけで、API や認証は使っていない
 
@@ -57,3 +57,12 @@
 - フッターの権利表記を「© 2026 shinpoyo. All rights reserved.」に変更
 - 「ラーメン二郎」の表記が残っていた統合前のモック（`mock/`）を削除
 - 残る要確認：**C（AI 生成画像の利用条件）**は、リポジトリ公開＝画像の公開になるため、公開前の確認を推奨
+
+## 追記（2026-10-11 広告導入の準備）
+
+- Google AdSense を導入予定。ID を設定するまで広告コードは出力されない（ビルド結果に含まれない）
+- プライバシーポリシーを shinpoyo.com/privacy/ に新設し、フッターからリンク
+  - 広告 Cookie の利用とオプトアウト方法（Google 広告設定・aboutads.info）
+  - 電気通信事業法の外部送信規律に沿って、送信先（Google AdSense・Google Fonts・GitHub Pages・X 共有）、送信される情報、目的を一覧で公表
+- 広告はタイピング修行のポップアップ内・プレイ中には置かない（AdSense のポリシー・誤クリック防止）
+- 収益化にあたり、**C（AI 生成画像の利用条件）の確認は優先度が上がった**

@@ -33,6 +33,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           >
             完飲番付
           </button>
+          <a href="https://shinpoyo.com/privacy/" className="hover:text-[#ffe100] transition-colors">
+            プライバシーポリシー
+          </a>
         </div>
       </div>
       <div className="max-w-[920px] mx-auto px-4 mt-6 text-[11px] leading-relaxed text-[#979177] font-bold font-mplus">
