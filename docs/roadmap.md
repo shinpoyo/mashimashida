@@ -48,8 +48,9 @@
 - [x] ビルドを相対パス化（どのホスティングでも動く）
 - [x] OGP 画像（`public/ogp.jpg`）と `SITE_URL` による共有カードの出力
 - [x] CI（型チェック・テスト・ビルド）と GitHub Pages デプロイの workflow
-- [ ] 公開先・ライセンスの決定（[publishing.md](publishing.md)）
-- [ ] `main` へのマージと Pages の有効化
+- [x] 公開先・ライセンスの決定（公開リポジトリ＋GitHub Pages、権利保持。[publishing.md](publishing.md)）
+- [x] `main` へのプルリクエスト作成
+- [ ] マージ・リポジトリ公開・Pages の有効化（オーナー作業）
 
 ## フェーズ4：全国完飲番付（オンライン化）
 

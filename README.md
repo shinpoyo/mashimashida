@@ -60,7 +60,6 @@ scripts/         画像生成スクリプト（make_ticket_photos.py）
   data/player.ts プレイヤー（常連客）の名前・アイコン
 tests/           エンジンのテスト
 docs/            統合分析・作業履歴・ロードマップ
-mock/            統合前の静的モック（参考）
 ```
 
 ## ドキュメント
@@ -71,6 +70,12 @@ mock/            統合前の静的モック（参考）
 - [コンプライアンスチェック](docs/compliance.md)
 - [ラーメン画像の差分計画](docs/image-variants.md)
 - [公開手順](docs/publishing.md)
+
+## 権利・ライセンス
+
+Copyright (c) 2026 shinpoyo. All rights reserved.
+ソースコード・画像・文章の無断転載・改変・再配布を禁じます（遊ぶこと・閲覧することは自由です）。
+第三者のライブラリ・フォント・テンプレートについては [LICENSE](LICENSE) を参照してください。
 
 ## 免責
 

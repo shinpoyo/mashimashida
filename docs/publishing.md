@@ -6,6 +6,24 @@
 - 作業はすべて `claude/peaceful-shannon-j91m6m` ブランチにあり、**`main` にはまだ入っていない**
 - テストプレイ版は Claude の Artifact（非公開リンク）で公開中
 
+## 決定事項（2026-10-11）
+
+- 公開先：**リポジトリを公開して GitHub Pages**（案 A）→ `https://shinpoyo.github.io/mashimashida/`
+- ライセンス：**権利保持（無断利用不可）**。`LICENSE` に記載
+- AI Studio 由来の `metadata.json` / `.env.example` は削除済み
+- 作業ブランチ → `main` のプルリクエストを作成
+
+## あなたが行う作業（GitHub の画面で）
+
+1. **プルリクエストをマージ**（CI が緑になっていることを確認）
+2. **リポジトリを公開**：Settings → General → 一番下の Danger Zone → **Change repository visibility** → Public
+3. **Pages を有効化**：Settings → Pages → Build and deployment → Source を **GitHub Actions**
+4. **Actions** タブ → 「Deploy to GitHub Pages」→ **Run workflow**（main）で初回デプロイ
+   - 以降は main に入るたびに自動で公開される
+5. 数分後に `https://shinpoyo.github.io/mashimashida/` を開いて確認
+
+> 公開前のおすすめ確認：[compliance.md](compliance.md) の C（AI 生成画像の利用条件）
+
 ## 準備済みのもの
 
 | 項目 | 内容 |

@@ -1,0 +1,27 @@
+Copyright (c) 2026 shinpoyo. All rights reserved.
+
+本リポジトリのソースコード・画像・文章・その他すべての内容の著作権は shinpoyo に帰属します。
+著作権者の書面による許可なく、複製・改変・再配布・転載・商用利用することを禁じます。
+（ブラウザでゲームを遊ぶこと、および GitHub 上でソースコードを閲覧することは自由です）
+
+This repository is published for viewing and playing only. No license is granted
+to copy, modify, redistribute, or use any part of it without prior written
+permission from the copyright holder.
+
+--------------------------------------------------------------------------------
+第三者のソフトウェア・素材（Third-party notices）
+
+以下は、それぞれのライセンスに従って利用しています。上記の権利保持はこれらには及びません。
+
+- 雛形：Google AI Studio のアプリテンプレート（Apache License 2.0）
+  - 一部のファイル（src/App.tsx の SPDX 表記など）はこのテンプレートに由来します
+- 実行時ライブラリ（ビルド成果物に含まれます）
+  - React / React DOM / scheduler — MIT License, Copyright (c) Meta Platforms, Inc. and affiliates.
+  - canvas-confetti — ISC License, Copyright (c) 2020, Kiril Vatev
+- 開発用ツール（成果物には含まれません）
+  - Vite / @vitejs/plugin-react / Tailwind CSS / @tailwindcss/vite / autoprefixer — MIT License
+  - TypeScript — Apache License 2.0
+- フォント（Google Fonts から読み込み）
+  - Dela Gothic One / M PLUS 1p / JetBrains Mono — SIL Open Font License 1.1
+  - Material Symbols — Apache License 2.0
+- 画像：店主・ラーメンの写真は Google AI Studio で生成した画像（およびその加工）です

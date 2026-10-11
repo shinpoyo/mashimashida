@@ -40,7 +40,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           ※本作は非公式のファンメイド作品であり、実在の店舗・団体とは一切関係ありません。コールの呼び方やルールは店舗ごとに異なります。実際のお店では各店のルールに従いましょう。
         </p>
         <p>※店主・ラーメンの写真は AI で生成した画像で、実在の人物・店舗ではありません。</p>
-        <p className="font-mono-code mt-1">© マシマシ打 制作チーム</p>
+        <p className="font-mono-code mt-1">© 2026 shinpoyo. All rights reserved. 無断転載・改変・再配布を禁じます。</p>
       </div>
     </footer>
   );

@@ -297,3 +297,17 @@
 - `bun install --frozen-lockfile`（CI と同じ条件）・`tsc`・ビルド成功
 - `SITE_URL` 指定時のみ OGP タグが入ることを確認
 - `/mashimashida/` のサブパスで配信してプレイ開始まで動作（画像読み込み・JS エラーなし）
+
+### 決定事項（ユーザー回答）
+- 公開先：リポジトリを公開して GitHub Pages
+- ライセンス：権利保持（無断利用不可）
+- 作業ブランチ → main のプルリクエストを作成
+- AI Studio 由来のファイル（metadata.json / .env.example）を削除
+
+### 追加作業
+- `LICENSE`：All rights reserved（日英）＋第三者表記（AI Studio テンプレート・React・canvas-confetti・開発ツール・フォント・AI 生成画像）
+- フッター・README に権利表記を追加
+- 公開に先立ち全履歴を確認：機密情報なし、コミットのメールは noreply のみ
+- 「ラーメン二郎」表記が残る統合前のモック `mock/` を削除（Git 履歴から復元可能）
+- CI 初回実行：成功（型チェック・テスト・ビルド）
+- [publishing.md](publishing.md) にオーナー作業（マージ → 公開設定 → Pages 有効化 → 初回デプロイ）を記載
