@@ -15,7 +15,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
   const strikeRate = games ? Math.round((userStats.strikesCount / games) * 1000) / 10 : 0;
 
   const handleShareX = () => {
-    soundManager.playKeyStroke();
+    soundManager.uiClick();
     const r = lastResult;
     const body = r
       ? `マシマシ打【${TICKET_CONFIGS[r.mode].name}／${PENALTY_BY_ID[r.penalty].name}】で「${r.rank}」認定！\nスコア ${r.score} / 正確率 ${r.accuracy.toFixed(1)}% / ${r.kps.toFixed(2)}打鍵/秒`

@@ -16,13 +16,13 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
   const [copied, setCopied] = useState<boolean>(false);
 
   const handleSaveCall = () => {
-    soundManager.playKeyStroke();
+    soundManager.uiClick();
     onUpdateStats({ favoriteCall });
     setIsEditingCall(false);
   };
 
   const handleCopyProfile = () => {
-    soundManager.playKeyStroke();
+    soundManager.uiClick();
     navigator.clipboard.writeText(
       `【マシマシ打 マイ厨房】\n称号: ${userStats.title}\n通算完飲: ${userStats.bowlsCleared}杯\n最高速度: ${userStats.maxWpm} WPM\n正確率: ${userStats.accuracyAvg}%\n愛用コール: ${favoriteCall}`
     );

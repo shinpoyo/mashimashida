@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
     const muted = soundManager.toggleMute();
     setIsMuted(muted);
     if (!muted) {
-      soundManager.playKeyStroke();
+      soundManager.uiClick();
     }
   };
 

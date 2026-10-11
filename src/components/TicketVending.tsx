@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, GameSettings, PenaltyId, UserStats } from '../types/game';
-import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER } from '../data/shop';
+import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER, toppingValue } from '../data/shop';
 import { MODES } from '../engine/calls';
 import { soundManager } from '../utils/audio';
 import { RamenPhoto } from './JiroArt';
@@ -22,7 +22,6 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
   const [selectedMode, setSelectedMode] = useState<GameMode>(initialSettings.mode);
   const [activeToppings, setActiveToppings] = useState<Set<string>>(new Set(initialSettings.toppings));
   const [penalty, setPenalty] = useState<PenaltyId>(initialSettings.penalty);
-  const [balance, setBalance] = useState<number>(2000);
   const [issuedMessage, setIssuedMessage] = useState<string>(`${TICKET_CONFIGS[initialSettings.mode].name} を選択中`);
   const [showIssuedBadge, setShowIssuedBadge] = useState<boolean>(false);
 
@@ -30,24 +29,20 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
   const mode = MODES[selectedMode];
   const rule = PENALTY_BY_ID[penalty];
 
-  const toppingsPrice = Array.from(activeToppings).reduce((acc, topId) => {
-    const top = TOPPING_BUFFS.find((t) => t.id === topId);
-    return acc + (top ? top.cost : 0);
-  }, 0);
-  const totalPrice = currentConfig.price + toppingsPrice;
-  const shortage = Math.max(0, totalPrice - balance);
+  // 魚粉（スコア倍率）× 退店ペナルティ倍率
+  const scoreMult = (toppingValue(Array.from(activeToppings), 'score_multiplier') || 1) * rule.scoreRate;
 
   const handleSelectMode = (m: GameMode) => {
     setSelectedMode(m);
     const cfg = TICKET_CONFIGS[m];
-    soundManager.playKeyStroke();
+    soundManager.ticketSelect();
     setIssuedMessage(`${cfg.name} の食券ボタンを押下 (${cfg.noddle})`);
     setShowIssuedBadge(true);
     setTimeout(() => setShowIssuedBadge(false), 2200);
   };
 
   const toggleTopping = (topId: string) => {
-    soundManager.playKeyStroke();
+    soundManager.uiClick();
     setActiveToppings((prev) => {
       const next = new Set(prev);
       if (next.has(topId)) next.delete(topId);
@@ -56,26 +51,8 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
     });
   };
 
-  const handleInsertMoney = (amount: number) => {
-    soundManager.playKeyStroke();
-    setBalance((prev) => prev + amount);
-  };
-
-  const handleReturnLever = () => {
-    soundManager.playKeyStroke();
-    if (balance > 0) {
-      setIssuedMessage(`おつり ¥${balance.toLocaleString()} を返却しました。`);
-      setBalance(0);
-    }
-  };
-
   const handleStart = () => {
-    if (shortage > 0) {
-      soundManager.playMistake();
-      setIssuedMessage(`投入金額が ¥${shortage.toLocaleString()} 足りません。硬貨を入れてください。`);
-      return;
-    }
-    soundManager.playCriticalHit();
+    soundManager.ticketIssue();
     onStartGame({ mode: selectedMode, toppings: Array.from(activeToppings), penalty });
   };
 
@@ -95,7 +72,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedMode, activeToppings, penalty, balance]);
+  }, [selectedMode, activeToppings, penalty]);
 
   return (
     <div className="flex flex-col w-full pb-16">
@@ -126,39 +103,6 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
                 <span className="font-mono-code text-[10px] text-[#cec6aa] tracking-widest font-bold">AUTOMATIC TICKET VENDING SYSTEM</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-[#0e0e0e] px-3 py-1.5 rounded-lg shadow-inner border border-[#4c4732] whitespace-nowrap">
-              <span className="font-mono-code text-[10px] text-[#cec6aa] font-bold">投入金額</span>
-              <span className="font-mono-code text-xl text-[#ffe100] font-black">¥ {balance.toLocaleString()}</span>
-            </div>
-          </div>
-
-          {/* Coin / Bill / Return */}
-          <div className="grid grid-cols-3 gap-3 bg-[#201f1f] rounded-lg p-3 shadow-inner border border-[#353534]">
-            <div className="flex flex-col items-center justify-center p-2 rounded bg-[#2a2a2a] text-center border border-[#353534]">
-              <span className="text-[10px] text-[#cec6aa] mb-1 font-bold">硬貨投入口</span>
-              <div className="w-12 h-2 rounded-full bg-[#0e0e0e] my-1 shadow-inner border border-[#4c4732]" />
-              <div className="flex items-center gap-1 font-mono-code text-[10px] text-[#e1c700] font-bold">
-                <button type="button" onClick={() => handleInsertMoney(100)} className="hover:underline cursor-pointer" title="100円投入">+100</button>
-                <span>/</span>
-                <button type="button" onClick={() => handleInsertMoney(500)} className="hover:underline cursor-pointer" title="500円投入">+500</button>
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center p-2 rounded bg-[#2a2a2a] text-center border border-[#353534]">
-              <span className="text-[10px] text-[#cec6aa] mb-1 font-bold">千円札挿入口</span>
-              <div className="w-16 h-1.5 rounded-full bg-[#0e0e0e] my-1 shadow-inner border border-[#4c4732]" />
-              <button type="button" onClick={() => handleInsertMoney(1000)} className="font-mono-code text-[10px] text-[#e1c700] font-bold hover:underline cursor-pointer" title="千円札投入">
-                1000円投入
-              </button>
-            </div>
-            <button
-              onClick={handleReturnLever}
-              className="flex flex-col items-center justify-center p-2 rounded bg-[#353534] hover:bg-[#3a3939] transition-all shadow-md active:translate-y-0.5 text-center cursor-pointer border border-[#4c4732]"
-              type="button"
-            >
-              <span className="text-[10px] text-[#cec6aa] mb-1 font-bold">返却レバー</span>
-              <span className="material-symbols-outlined text-[#e5e2e1] text-lg">rotate_right</span>
-              <span className="text-[10px] text-[#ffb4ab] font-bold">おつり</span>
-            </button>
           </div>
 
           {/* Main Course Selection */}
@@ -289,8 +233,8 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
                 <span className="font-mono-code text-lg text-[#ffb3ae] font-black">{currentConfig.speedTarget}</span>
               </div>
               <div className="bg-[#201f1f] p-2.5 rounded-lg text-center shadow-sm border border-[#353534]">
-                <span className="text-[10px] text-[#cec6aa] block font-bold">合計金額</span>
-                <span className="font-mono-code text-lg text-[#ffe100] font-black">¥{totalPrice.toLocaleString()}</span>
+                <span className="text-[10px] text-[#cec6aa] block font-bold">スコア倍率</span>
+                <span className="font-mono-code text-lg text-[#ffe100] font-black">×{scoreMult.toFixed(2)}</span>
               </div>
             </div>
 
@@ -309,7 +253,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
                       type="button"
                       data-penalty={p.id}
                       onClick={() => {
-                        soundManager.playKeyStroke();
+                        soundManager.uiClick();
                         setPenalty(p.id);
                       }}
                       className={`flex flex-col items-start p-2 rounded-lg border text-left cursor-pointer transition-all ${
@@ -335,7 +279,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
               className="group mt-2 w-full py-4 px-6 rounded-xl bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-lg text-center tracking-wider transition-all duration-150 shadow-hard-lg active:translate-y-1 flex items-center justify-center gap-3 cursor-pointer"
             >
               <span className="material-symbols-outlined text-2xl group-hover:animate-bounce">sports_kabaddi</span>
-              <span>{shortage > 0 ? `あと ¥${shortage.toLocaleString()} 投入せよ` : '食券を握りしめて着席！修行開始'}</span>
+              <span>食券を握りしめて着席！修行開始</span>
               <span className="material-symbols-outlined text-2xl">arrow_forward</span>
             </button>
 

@@ -91,6 +91,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const phaseRef = useRef<Phase>('countdown');
   const pausedRef = useRef<boolean>(false);
   const pausedAt = useRef<number>(0);
+  const nextTickAt = useRef<number>(0);
   const timers = useRef<number[]>([]);
   const rafId = useRef<number>(0);
   const timerBar = useRef<HTMLDivElement>(null);
@@ -153,10 +154,10 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       setPhaseBoth('over');
       if (opts.expelled || opts.gaveUp) {
         say('二度と来るな！', 'stern');
-        soundManager.playMistake();
+        soundManager.expelled();
       } else {
         say('ありがとうございましたー', 'success');
-        soundManager.playVictory();
+        soundManager.victory();
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#ffe100', '#c0282d', '#ffffff'] });
       }
     },
@@ -173,6 +174,12 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     }
     if (angerBar.current) angerBar.current.style.width = `${Math.min(100, (1 - ratio) * 65 + s.breaks * 15)}%`;
     if (ratio <= 0) return timeout();
+    // 残り時間わずか：拍子木で急かす（終盤ほど速く）
+    const now = performance.now();
+    if (ratio < 0.35 && now >= nextTickAt.current) {
+      soundManager.tick();
+      nextTickAt.current = now + (ratio < 0.15 ? 250 : 500);
+    }
     rafId.current = requestAnimationFrame(loop);
   };
 
@@ -215,7 +222,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     const remain = Math.max(0, s.limit - ms / 1000);
     const gained = Math.round(lotScore(cfg, s.typer!.typed.length, remain) * scoreMult);
     s.score += gained;
-    soundManager.playSlurp();
+    soundManager.serve(remain / s.limit > 0.5);
     const call = s.calls[s.idx];
     setCardState('ok');
     if (cfg.super) setRevealed(`正解！ ${call.display}`);
@@ -232,7 +239,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     const s = g.current;
     endLot();
     setPhaseBoth('serve');
-    soundManager.playMistake();
+    soundManager.lotBreak();
     setCardState('ng');
     const call = s.calls[s.idx];
     if (cfg.super) setRevealed(`正解：${call.display}`);
@@ -266,7 +273,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     if (!s.typer) return;
     if (s.typer.input(ch)) {
       s.keys++;
-      soundManager.playKeyStroke();
+      soundManager.keyStroke();
       if (s.typer.done) success();
       else rerender();
       return;
@@ -277,12 +284,12 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     if (s.shields > 0) {
       s.shields--;
       setVerdict(`生卵バリア！ミス無効（残り${s.shields}）`);
-      soundManager.playWarning();
+      soundManager.shield();
       rerender();
       return;
     }
     s.miss++;
-    soundManager.playMistake();
+    soundManager.mistake();
     setVerdict('MISS…店主の眉が動いた');
     rerender();
     if (rule.maxMisses !== null && s.miss >= rule.maxMisses) {
@@ -309,12 +316,12 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     const tick = () => {
       if (n > 0) {
         setCountdown(n);
-        soundManager.playKeyStroke();
+        soundManager.countdown();
         n--;
         later(tick, 700);
       } else {
         setCountdown(0);
-        soundManager.playCriticalHit();
+        soundManager.go();
         nextLot();
       }
     };
@@ -328,6 +335,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       pausedAt.current = performance.now();
       pausedRef.current = true;
       setPaused(true);
+      soundManager.pause();
     } else {
       g.current.lotStart += performance.now() - pausedAt.current;
       pausedRef.current = false;
