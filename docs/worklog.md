@@ -373,3 +373,11 @@
   - CI の workflow に `permissions: contents: read` を追加（トークン権限の最小化）
   - おすすめ（ユーザー作業）：なりすましメール対策（SPF `-all`・DMARC reject・Null MX）、CAA、DNSSEC、GitHub の2要素認証、ドメインの自動更新
 - X 用の告知ポスト案 3 本を [promotion.md](promotion.md) に作成（文字数確認済み、二郎系の語は不使用）
+
+## 2026-10-11 告知ポストの画像・動画と見本ページ
+
+- 公開サイトを Playwright で自動プレイして撮影 → `docs/promo/` に保存
+  - 動画 `mashimashi_play.mp4`（28秒・1280×720・H.264・無音）：タイムラインで目を引くよう冒頭をプレイ場面にし、終盤 → 結果 → URL カードで締める。ポップアップ部分を切り抜いて文字を大きく
+  - 画像：プレイ画面・食券購入・結果（2倍解像度で撮影）、URL カード
+- 見本ページ（A 動画／B 画像1枚／C 画像4枚、投稿文のコピーボタン付き）を Artifact で作成：https://claude.ai/artifact/14RQLwNjuB9me2iFEN9rdQ
+- [promotion.md](promotion.md) に素材一覧と案ごとの添付を追記

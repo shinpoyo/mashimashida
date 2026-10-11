@@ -1,9 +1,23 @@
 # 告知ポスト案（X）
 
-- URL を付けると、共有カード（`public/ogp.jpg`）が自動で表示される。画像を添付するなら、プレイ画面のスクリーンショット（`docs/screenshots/p17-play.png` など）か、実際に打っている様子の短い動画が効果的
+- URL を付けると、共有カード（`public/ogp.jpg`）が自動で表示される。ただし画像・動画を添付するとカードは出ない
+- 見本ページ（画像・動画込み）：https://claude.ai/artifact/14RQLwNjuB9me2iFEN9rdQ （非公開。本人のみ閲覧可）
+
+## 素材（`docs/promo/`）
+
+公開中の https://shinpoyo.com/mashimashida/ を自動操作（大ラーメン・ペナルティなし）して撮影。
+
+| ファイル | 内容 | 使う案 |
+|---|---|---|
+| `mashimashi_play.mp4` | 28秒・1280×720・H.264・音声なし。1ロット目 → 終盤 → 結果（麺神）→ URL カード | A |
+| `play.png` | プレイ画面（1600×900、ポップアップ部分を切り抜き） | B・C |
+| `ticket.png` | 食券購入画面（大ラーメン選択） | C |
+| `result.png` | 結果画面（称号「麺神」） | C |
+| `endcard.png` | タイトル・キャッチコピー・URL のカード | C |
+| `video_poster.jpg` | 動画のサムネイル | — |
 - 文字数は X の上限（全角 140 字相当）以内を確認済み
 
-## A. 王道（紹介）
+## A. 王道（紹介）＋動画 `mashimashi_play.mp4`
 
 ```
 山盛りラーメンの「コール」で戦うタイピングゲーム『マシマシ打』を作りました🍜
@@ -17,7 +31,7 @@ https://shinpoyo.com/mashimashida/
 #マシマシ打 #タイピングゲーム
 ```
 
-## B. 短く煽る
+## B. 短く煽る＋画像 `play.png`
 
 ```
 「ヤサイマシマシニンニクアブラカラメ」
@@ -30,7 +44,7 @@ https://shinpoyo.com/mashimashida/
 #マシマシ打 #タイピングゲーム
 ```
 
-## C. 挑戦状
+## C. 挑戦状＋画像4枚（`ticket.png` → `play.png` → `result.png` → `endcard.png`）
 
 ```
 【挑戦者求む】
