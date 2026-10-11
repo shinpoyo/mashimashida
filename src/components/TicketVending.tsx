@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AdSlot } from './AdSlot';
 import { GameMode, GameSettings, PenaltyId, UserStats } from '../types/game';
 import { TICKET_CONFIGS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER } from '../data/shop';
 import { MODES } from '../engine/calls';
@@ -268,6 +269,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
           </details>
         </div>
       </div>
+      <AdSlot className="mt-8" />
     </div>
   );
 };

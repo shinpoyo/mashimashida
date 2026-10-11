@@ -70,6 +70,8 @@ docs/            統合分析・作業履歴・ロードマップ
 - [ロードマップ](docs/roadmap.md)
 - [作業履歴](docs/worklog.md)
 - [コンプライアンスチェック](docs/compliance.md)
+- [セキュリティチェック](docs/security.md)
+- [告知ポスト案](docs/promotion.md)
 - [ラーメン画像の差分計画](docs/image-variants.md)
 - [公開手順](docs/publishing.md)
 - [独自ドメインの取得と設定](docs/custom-domain.md)

@@ -35,6 +35,9 @@ jobs:
       - run: SITE_URL="https://${BASE_URL#*://}/" bun run build
         env:
           BASE_URL: ${{ steps.pages.outputs.base_url }}
+          # 広告（Google AdSense）。リポジトリの Settings → Secrets and variables → Actions → Variables で設定。未設定なら広告なし
+          VITE_ADSENSE_CLIENT: ${{ vars.ADSENSE_CLIENT }}
+          VITE_ADSENSE_SLOT: ${{ vars.ADSENSE_SLOT }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

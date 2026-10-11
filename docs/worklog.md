@@ -361,3 +361,34 @@
   - 原因：`configure-pages` の `base_url` が http を返した（HTTPS 強制が反映される前のため）
   - 対応：workflow で `https://` に揃えてから `SITE_URL` に渡すよう修正（main に入ったら再デプロイで直る）
 - README・publishing.md・custom-domain.md・roadmap のプレイ URL を `https://shinpoyo.com/mashimashida/` に更新
+- PR #2 マージ → 自動デプロイで OGP（`og:url`・`og:image`・`twitter:image`）が `https://shinpoyo.com/mashimashida/` になったことを確認。`ogp.jpg` も 200
+
+---
+
+## 2026-10-11 セキュリティチェックと告知ポスト案
+
+- ユーザーが `http://shinpoyo.com` → `https://` への転送を確認
+- セキュリティチェックを実施し [security.md](security.md) にまとめた：重大な問題なし
+  - DNS（ワイルドカードなし・所有確認済み）、移管ロック、登録者情報の非公開（国・都道府県のみ公開）、機密情報・個人情報なし、`bun audit` 0 件、XSS の入口なし
+  - CI の workflow に `permissions: contents: read` を追加（トークン権限の最小化）
+  - おすすめ（ユーザー作業）：なりすましメール対策（SPF `-all`・DMARC reject・Null MX）、CAA、DNSSEC、GitHub の2要素認証、ドメインの自動更新
+- X 用の告知ポスト案 3 本を [promotion.md](promotion.md) に作成（文字数確認済み、二郎系の語は不使用）
+
+## 2026-10-11 告知ポストの画像・動画と見本ページ
+
+- 公開サイトを Playwright で自動プレイして撮影 → `docs/promo/` に保存
+  - 動画 `mashimashi_play.mp4`（28秒・1280×720・H.264・無音）：タイムラインで目を引くよう冒頭をプレイ場面にし、終盤 → 結果 → URL カードで締める。ポップアップ部分を切り抜いて文字を大きく
+  - 画像：プレイ画面・食券購入・結果（2倍解像度で撮影）、URL カード
+- 見本ページ（A 動画／B 画像1枚／C 画像4枚、投稿文のコピーボタン付き）を Artifact で作成：https://claude.ai/artifact/14RQLwNjuB9me2iFEN9rdQ
+- [promotion.md](promotion.md) に素材一覧と案ごとの添付を追記
+
+## 2026-10-11 広告（Google AdSense）の準備
+
+- 方針（ユーザー決定）：Google AdSense。場所は食券購入の下部・完飲番付・常連カード・個人サイトのトップ・結果画面の近く
+  - 結果画面はタイピング修行のポップアップ内に出るため、AdSense のポリシー（ポップアップ内の広告禁止）に合わせて置かない。結果から `Enter` で移る完飲番付の広告で代わりにする
+- `src/components/AdSlot.tsx`：ビルド時の `VITE_ADSENSE_CLIENT` / `VITE_ADSENSE_SLOT` が両方あるときだけ広告枠を出し、AdSense のスクリプトを1回だけ読み込む。未設定ならビルド結果に広告コードが入らない
+- 食券購入・完飲番付・常連カードの末尾に広告枠を配置
+- `deploy-pages.yml`：リポジトリの Actions 変数 `ADSENSE_CLIENT` / `ADSENSE_SLOT` をビルドに渡す
+- フッターにプライバシーポリシー（https://shinpoyo.com/privacy/ 、shinpoyo.github.io リポジトリで作成）へのリンク
+- 確認：型チェック・テスト 18 件・ビルド OK。ID 未設定のビルドに広告コードなし。ダミー ID のビルドで 3 画面に枠が出て、ポップアップ内は 0、スクリプト読み込み 1 回、JS エラーなし
+- compliance.md・security.md を広告導入に合わせて更新。手順は shinpoyo.github.io の `docs/adsense.md`
