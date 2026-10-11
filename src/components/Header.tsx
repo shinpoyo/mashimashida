@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
+import { PlayerAvatar } from './PlayerAvatar';
+import type { PlayerAvatar as Avatar } from '../data/player';
+import { LogoMark } from './Logo';
 
 interface HeaderProps {
   currentScreen: ScreenType;
   onNavigate: (screen: ScreenType) => void;
   bowlsCleared: number;
+  playerName: string;
+  avatar: Avatar;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowlsCleared }) => {
+export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowlsCleared, playerName, avatar }) => {
   const [isMuted, setIsMuted] = useState(soundManager.getMuted());
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -24,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
     const muted = soundManager.toggleMute();
     setIsMuted(muted);
     if (!muted) {
-      soundManager.playKeyStroke();
+      soundManager.uiClick();
     }
   };
 
@@ -50,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           </span>
           <div className="flex items-center gap-4">
             <span className="hidden sm:inline-block text-[10px] bg-[#0e0e0e] text-[#ffe100] px-2 py-0.5 rounded font-dela tracking-wider">
-              JIRO-TYPING LEAGUE
+              MASHIMASHI TYPING LEAGUE
             </span>
             <span className="text-[11px] font-bold">本日の営業: 昼の部 炎上中</span>
           </div>
@@ -64,11 +69,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           className="flex items-center gap-3 shrink-0 cursor-pointer select-none"
           onClick={() => onNavigate('ticket-vending')}
         >
-          <img
-            alt="Mashimashi Typer Signboard Logo"
-            className="h-8 w-auto object-contain"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7mE3QIN4dMeXBUa8mfES-I3PNWiP_gzywRS7vksnjcNceZY34lDa6CRzRPgV2372wc4_6vyDoMNhBf7-F4XwAy7LJ885iHVESDDVlsRfu4welL7qeNDLi1eXMRFJwdVdmu9hSTQH5DZUOFK-78HMR4eVLqe893WAW6hzpMtCv1c8EctfXn-Ysg0u5vP37nLlpcSHEF8oDN0gqI031Y53X9sBZo_xTTYk7b1uT3g8xdRy-7drmZd0L"
-          />
+          <LogoMark className="h-11 w-11 drop-shadow-[2px_2px_0_#000]" />
           <div className="flex flex-col">
             <span className="font-dela text-lg text-[#ffe100] tracking-wider leading-none drop-shadow-[2px_2px_0_#000000]">
               マシマシ打
@@ -94,28 +95,6 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           </button>
           <button
             type="button"
-            onClick={() => onNavigate('typing-battle')}
-            className={`px-3 py-1.5 rounded transition-all whitespace-nowrap text-sm cursor-pointer ${
-              currentScreen === 'typing-battle'
-                ? 'bg-[#ffe100] text-[#0e0e0e] font-dela shadow-[0_3px_0_#000000]'
-                : 'text-[#cec6aa] font-bold hover:bg-[#2a2a2a] hover:text-[#e5e2e1]'
-            }`}
-          >
-            タイピング修行
-          </button>
-          <button
-            type="button"
-            onClick={() => onNavigate('call-master')}
-            className={`px-3 py-1.5 rounded transition-all whitespace-nowrap text-sm cursor-pointer ${
-              currentScreen === 'call-master'
-                ? 'bg-[#ffe100] text-[#0e0e0e] font-dela shadow-[0_3px_0_#000000]'
-                : 'text-[#cec6aa] font-bold hover:bg-[#2a2a2a] hover:text-[#e5e2e1]'
-            }`}
-          >
-            コール道場
-          </button>
-          <button
-            type="button"
             onClick={() => onNavigate('leaderboard')}
             className={`px-3 py-1.5 rounded transition-all whitespace-nowrap text-sm cursor-pointer ${
               currentScreen === 'leaderboard'
@@ -127,14 +106,14 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           </button>
           <button
             type="button"
-            onClick={() => onNavigate('my-kitchen')}
+            onClick={() => onNavigate('regular-card')}
             className={`px-3 py-1.5 rounded transition-all whitespace-nowrap text-sm cursor-pointer ${
-              currentScreen === 'my-kitchen'
+              currentScreen === 'regular-card'
                 ? 'bg-[#ffe100] text-[#0e0e0e] font-dela shadow-[0_3px_0_#000000]'
                 : 'text-[#cec6aa] font-bold hover:bg-[#2a2a2a] hover:text-[#e5e2e1]'
             }`}
           >
-            マイ厨房
+            常連カード
           </button>
         </nav>
 
@@ -178,27 +157,20 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
             </button>
           </div>
 
-          {/* Ninniku speech balloon & User Avatar */}
-          <div className="flex items-center gap-2 pl-2 border-l border-[#353534]">
-            <div className="relative hidden md:block">
-              <div className="bg-[#3a3939] text-[#e5e2e1] border border-[#ffe100] px-2.5 py-1 rounded-lg text-xs font-dela shadow-[2px_2px_0_#000000] whitespace-nowrap">
-                ニンニク入れますか？
-                <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-2 h-2 bg-[#3a3939] border-t border-r border-[#ffe100] rotate-45" />
-              </div>
-            </div>
-            <div 
-              className="relative group cursor-pointer"
-              onClick={() => onNavigate('my-kitchen')}
-              title="マイ厨房を開く"
-            >
-              <img
-                alt="Profile"
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-[#ffe100] shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoayYLQ4-AJXcGtoDZTQXxCvLqHXcKmfbX8h4YcoZF98070-rpN-9YHbkqGCk4E2yPQBNmbeUsdHyjPpmYTPPJBSw9XwIiDiGSrlSIdSOxG1Z4RYnmk6R3PMbqBgRHXiHXKn0NIhbQOKbljrnA6iK-M-np7oiW7_UUCPsvYonwArfGV1XtwTR_RV7EVS6Ig4CShy92LjHfiqm2RfozWFxs9JEMP2X-K6v_gJVJYaXRwyB_lhMtYHxS"
-              />
-              <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#970015] border border-[#0e0e0e] rounded-full" />
-            </div>
-          </div>
+          {/* プレイヤー（常連客）。店主とは別人なので、自分のアイコンと名前を表示 */}
+          <button
+            type="button"
+            id="playerChip"
+            className="flex items-center gap-2 pl-3 border-l border-[#353534] cursor-pointer group"
+            onClick={() => onNavigate('regular-card')}
+            title="常連カード（あなたのプロフィール）を開く"
+          >
+            <PlayerAvatar avatar={avatar} size={34} />
+            <span className="hidden md:flex flex-col items-start leading-tight">
+              <span className="text-[9px] text-[#cec6aa] font-bold">あなた（常連客）</span>
+              <span className="text-xs font-dela text-[#e5e2e1] group-hover:text-[#ffe100] max-w-[8rem] truncate">{playerName}</span>
+            </span>
+          </button>
         </div>
       </div>
 
@@ -213,22 +185,6 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           食券購入
         </button>
         <button
-          onClick={() => onNavigate('typing-battle')}
-          className={`px-2.5 py-1 text-xs rounded whitespace-nowrap cursor-pointer ${
-            currentScreen === 'typing-battle' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
-          }`}
-        >
-          タイピング修行
-        </button>
-        <button
-          onClick={() => onNavigate('call-master')}
-          className={`px-2.5 py-1 text-xs rounded whitespace-nowrap cursor-pointer ${
-            currentScreen === 'call-master' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
-          }`}
-        >
-          コール道場
-        </button>
-        <button
           onClick={() => onNavigate('leaderboard')}
           className={`px-2.5 py-1 text-xs rounded whitespace-nowrap cursor-pointer ${
             currentScreen === 'leaderboard' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
@@ -237,12 +193,12 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           完飲番付
         </button>
         <button
-          onClick={() => onNavigate('my-kitchen')}
+          onClick={() => onNavigate('regular-card')}
           className={`px-2.5 py-1 text-xs rounded whitespace-nowrap cursor-pointer ${
-            currentScreen === 'my-kitchen' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
+            currentScreen === 'regular-card' ? 'bg-[#ffe100] text-[#0e0e0e] font-dela' : 'text-[#cec6aa]'
           }`}
         >
-          マイ厨房
+          常連カード
         </button>
       </div>
     </header>

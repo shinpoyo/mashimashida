@@ -94,3 +94,60 @@
 .animate-rage {
   animation: rage-pulse 1.2s infinite ease-in-out;
 }
+
+/* ---------- SVG 丼（超ハード出題用・mashimashityping から移植） ---------- */
+.jiro-bowl svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.jiro-bowl .bowl {
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.55));
+}
+.bowl-steam {
+  animation: steamDrift 2.8s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+@keyframes steamDrift {
+  0% { transform: translateY(0) scaleX(1); opacity: 0.55; }
+  50% { transform: translateY(-10px) scaleX(1.12); opacity: 0.8; }
+  100% { transform: translateY(-22px) scaleX(0.88); opacity: 0.2; }
+}
+.animate-chef-nod { animation: chefNod 0.5s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes chefNod {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px) scale(1.05); }
+  100% { transform: translateY(0); }
+}
+
+.animate-serve { animation: serve 0.45s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes serve {
+  0% { transform: translateY(-30px) scale(0.85); }
+  100% { transform: none; }
+}
+.animate-pop { animation: pop 0.25s ease; }
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  70% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75em;
+  background: #2a2a2a;
+  border: 1px solid #353534;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0 0.35em;
+  color: #e5e2e1;
+}
+
+.animate-fade-in { animation: fadeIn 0.35s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(1.03); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in, .animate-serve, .animate-pop, .animate-chef-nod { animation: none; }
+}
