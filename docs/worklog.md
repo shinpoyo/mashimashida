@@ -103,3 +103,10 @@
 
 ### 検証
 - `tsc --noEmit` / `vite build` 成功、E2E（JS エラーなし）
+
+---
+
+## 2026-10-11 テストプレイ版の公開
+
+- ビルド（相対パス）を Artifact として公開：https://claude.ai/artifact/Lf3wA2JLZjaA3hMt2UpLcy （非公開。オーナーのみ閲覧可）
+- 公開前の確認で、`utils/audio.ts` が localStorage を例外処理なしで読んでおり、ストレージが使えない環境（プライベートモード等）でアプリが起動しない問題を発見 → try/catch で修正

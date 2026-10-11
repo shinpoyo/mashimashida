@@ -9,8 +9,11 @@ class SoundManager {
 
   constructor() {
     // Check initial mute state from localStorage
-    const saved = localStorage.getItem('jiro_sound_muted');
-    this.isMuted = saved === 'true';
+    try {
+      this.isMuted = localStorage.getItem('jiro_sound_muted') === 'true';
+    } catch {
+      // ストレージが使えない環境（プライベートモード等）では既定値
+    }
   }
 
   private initCtx() {
@@ -31,7 +34,11 @@ class SoundManager {
 
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
-    localStorage.setItem('jiro_sound_muted', this.isMuted.toString());
+    try {
+      localStorage.setItem('jiro_sound_muted', this.isMuted.toString());
+    } catch {
+      // ignore
+    }
     return this.isMuted;
   }
 
