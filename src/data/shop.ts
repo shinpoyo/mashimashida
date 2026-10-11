@@ -71,15 +71,6 @@ export const TOPPING_BUFFS: ToppingBuff[] = [
     effectValue: 1.5,
   },
   {
-    id: 'fish',
-    name: '魚粉',
-    cost: 50,
-    desc: 'スコア1.2倍',
-    icon: 'set_meal',
-    effectType: 'score_multiplier',
-    effectValue: 1.2,
-  },
-  {
     id: 'ginger',
     name: '生姜',
     cost: 50,

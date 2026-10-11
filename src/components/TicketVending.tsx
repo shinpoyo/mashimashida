@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, GameSettings, PenaltyId, UserStats } from '../types/game';
-import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER, toppingValue } from '../data/shop';
+import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER } from '../data/shop';
 import { MODES } from '../engine/calls';
 import { soundManager } from '../utils/audio';
 import { RamenPhoto } from './JiroArt';
@@ -20,7 +20,10 @@ const TONE_STYLES = {
 
 export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, bestScores, onStartGame }) => {
   const [selectedMode, setSelectedMode] = useState<GameMode>(initialSettings.mode);
-  const [activeToppings, setActiveToppings] = useState<Set<string>>(new Set(initialSettings.toppings));
+  const [activeToppings, setActiveToppings] = useState<Set<string>>(
+    // 廃止された券（魚粉など）が保存設定に残っていても無視する
+    new Set(initialSettings.toppings.filter((id) => TOPPING_BUFFS.some((b) => b.id === id))),
+  );
   const [penalty, setPenalty] = useState<PenaltyId>(initialSettings.penalty);
   const [issuedMessage, setIssuedMessage] = useState<string>(`${TICKET_CONFIGS[initialSettings.mode].name} を選択中`);
   const [showIssuedBadge, setShowIssuedBadge] = useState<boolean>(false);
@@ -29,8 +32,8 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
   const mode = MODES[selectedMode];
   const rule = PENALTY_BY_ID[penalty];
 
-  // 魚粉（スコア倍率）× 退店ペナルティ倍率
-  const scoreMult = (toppingValue(Array.from(activeToppings), 'score_multiplier') || 1) * rule.scoreRate;
+  // スコア倍率は退店ペナルティで決まる（トッピング券では上がらない）
+  const scoreMult = rule.scoreRate;
 
   const handleSelectMode = (m: GameMode) => {
     setSelectedMode(m);
@@ -157,7 +160,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
             <span className="text-[10px] font-bold text-[#cec6aa] font-mono-code">複数選択可</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {TOPPING_BUFFS.map((top) => {
               const active = activeToppings.has(top.id);
               return (

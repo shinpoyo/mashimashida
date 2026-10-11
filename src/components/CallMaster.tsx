@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import { ChefPhoto, RamenPhoto } from './JiroArt';
+import { RuleIntro } from './RuleIntro';
 
 interface CallMasterProps {
   onGoToLeaderboard: () => void;
+  onBack: () => void;
 }
 
 interface CallComboState {
@@ -14,7 +16,9 @@ interface CallComboState {
   karame: string;
 }
 
-export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => {
+export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard, onBack }) => {
+  // ルール説明を読んでから開始する
+  const [started, setStarted] = useState<boolean>(false);
   // Call builder state
   const [callSelection, setCallSelection] = useState<CallComboState>({
     yasai: 'マシマシ',
@@ -33,7 +37,7 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => 
   // Input & matching
   const [typedChars, setTypedChars] = useState<string>('');
   const [timeRemaining, setTimeRemaining] = useState<number>(3.5);
-  const [isAnswering, setIsAnswering] = useState<boolean>(true);
+  const [isAnswering, setIsAnswering] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isFailed, setIsFailed] = useState<boolean>(false);
   const [isListeningMic, setIsListeningMic] = useState<boolean>(false);
@@ -145,6 +149,11 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => 
     }
   }, [callSelection]);
 
+  // 開始直後に入力欄へフォーカス
+  useEffect(() => {
+    if (started) inputRef.current?.focus();
+  }, [started]);
+
   // Handle typing input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.toUpperCase();
@@ -205,6 +214,7 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => 
   // Keyboard shortcut support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!started) return;
       if (e.key === 'Tab') {
         e.preventDefault();
         handleResetCall();
@@ -212,7 +222,7 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => 
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleResetCall]);
+  }, [handleResetCall, started]);
 
   // Voice Recognition support
   const handleToggleMic = () => {
@@ -270,6 +280,35 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => 
   // Romaji characters breakdown
   const strippedTypedLen = typedChars.replace(/\s+/g, '').length;
   let runningLen = 0;
+
+  if (!started) {
+    return (
+      <RuleIntro
+        eyebrow="コール道場"
+        title="コール即答試練"
+        chefLine="迷いは即ロット崩壊に繋がる。3.5秒で唱えろ"
+        steps={[
+          <>下の<b className="text-[#ffe100]">自作コール呪文ビルダー</b>で、練習したいコール（ヤサイ・ニンニク・アブラ・カラメ）を組みます。「ランダム生成」でお任せも可。</>,
+          <>入力欄に表示どおりのローマ字を打ち込みます。</>,
+          <>3.5秒以内に打ち切れば成功。時間切れは失敗です。</>,
+          <>Tab キーで同じコールにもう一度挑戦できます。</>,
+        ]}
+        rows={[
+          { label: '制限時間', value: '1コール 3.5秒' },
+          { label: '判定', value: '表示どおりの綴りのみ', note: '表記ゆれ（si/shi など）への対応は次の改修で入れます', tone: 'warn' },
+          { label: '記録', value: 'この画面の記録は番付に残りません' },
+          { label: '操作', value: 'Tab：やり直し' },
+        ]}
+        startLabel="道場に入る"
+        backLabel="食券売場へ戻る"
+        onStart={() => {
+          setStarted(true);
+          handleResetCall();
+        }}
+        onBack={onBack}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col w-full pb-16">

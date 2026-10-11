@@ -8,6 +8,7 @@ import { lotScore, judgeRank } from '../engine/scoring';
 import { soundManager } from '../utils/audio';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { BowlView, ChefPhoto, RamenPhoto, type ChefMood } from './JiroArt';
+import { RuleIntro } from './RuleIntro';
 
 interface TypingBattleProps {
   settings: GameSettings;
@@ -17,7 +18,7 @@ interface TypingBattleProps {
   onQuit: () => void;
 }
 
-type Phase = 'countdown' | 'play' | 'serve' | 'over';
+type Phase = 'intro' | 'countdown' | 'play' | 'serve' | 'over';
 
 interface GameState {
   calls: Call[];
@@ -46,7 +47,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const cfg = MODES[settings.mode];
   const ticket = TICKET_CONFIGS[settings.mode];
   const rule = PENALTY_BY_ID[settings.penalty];
-  const scoreMult = (toppingValue(settings.toppings, 'score_multiplier') || 1) * rule.scoreRate;
+  const scoreMult = rule.scoreRate;
   const timeBonus = toppingValue(settings.toppings, 'time_extend');
 
   const newState = (): GameState => ({
@@ -72,7 +73,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
 
   const g = useRef<GameState>(newState());
   const [, rerender] = useReducer((x: number) => x + 1, 0);
-  const [phase, setPhase] = useState<Phase>('countdown');
+  const [phase, setPhase] = useState<Phase>('intro');
   const [countdown, setCountdown] = useState<number>(3);
   const [paused, setPaused] = useState<boolean>(false);
   const [mood, setMood] = useState<ChefMood>('wait');
@@ -88,7 +89,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const [imeWarn, setImeWarn] = useState<boolean>(false);
   const [result, setResult] = useState<GameResult | null>(null);
 
-  const phaseRef = useRef<Phase>('countdown');
+  const phaseRef = useRef<Phase>('intro');
   const pausedRef = useRef<boolean>(false);
   const pausedAt = useRef<number>(0);
   const nextTickAt = useRef<number>(0);
@@ -352,11 +353,8 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     finish({ gaveUp: true });
   };
 
-  useEffect(() => {
-    start();
-    return clearTimers;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings]);
+  // 画面を開いたらまずルール説明（intro）。開始ボタンで start()
+  useEffect(() => clearTimers, []);
 
   // ---------- 入力 ----------
   const keyHandler = useRef<(e: KeyboardEvent) => void>(() => {});
@@ -368,6 +366,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     }
     setImeWarn(false);
     const p = phaseRef.current;
+    if (p === 'intro') return; // RuleIntro 側で Enter / Space / Esc を受ける
     if (p === 'over') {
       if (e.key === ' ') {
         e.preventDefault();
@@ -417,9 +416,53 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     combo_protect: `残り${s.comboGuards}`,
     break_forgive: `残り${s.forgives}`,
     time_extend: '発動中',
-    score_multiplier: '発動中',
   };
   const breaksLimit = rule.maxBreaks;
+
+  if (phase === 'intro') {
+    const steps = cfg.super
+      ? [
+          <>店主の「ニンニク入れますか？」の後、<b className="text-[#ffe100]">完成した丼の画像</b>が出ます。</>,
+          <>その丼になるコールをローマ字で打ちます。トッピングの順番は自由、全部同じ量なら「全マシ」でも正解。ヤサイ普通は省略できます。</>,
+          <>右の小さな丼（そのまま）と見比べて量を判断。打ち切ると丼が提供され、早いほど高得点です。</>,
+          <>持ち時間を過ぎると<b className="text-[#ff5555]">ロット乱し</b>。正解が表示されて次のロットへ進みます。</>,
+        ]
+      : [
+          <>店主の「ニンニク入れますか？」の後、<b className="text-[#ffe100]">あなたのコール</b>が表示されます。</>,
+          <>表示どおりにローマ字で打ちます。次に押すキーは黄色で光ります。</>,
+          <>打ち切ると丼が提供されます。残り時間が多いほど高得点です。</>,
+          <>持ち時間（黄色のバー）を過ぎると<b className="text-[#ff5555]">ロット乱し</b>。ミスタイプは正確率と称号に響きます。</>,
+        ];
+    const toppingNames = activeBuffs.map((b) => `${b.name}（${b.desc}）`);
+    return (
+      <RuleIntro
+        eyebrow="タイピング修行"
+        title={ticket.name}
+        chefLine={ticket.chefNote}
+        steps={steps}
+        rows={[
+          { label: 'ロット数', value: `${cfg.lots}杯`, note: '全ロット提供で完飲完食' },
+          {
+            label: 'コール',
+            value: cfg.super ? '画像から答える' : cfg.shuffle ? '順不同で出題' : '定番の順番',
+            note: cfg.super ? '順不同・全マシOK' : cfg.shuffle ? 'マシ×6・チョモランマも出る' : 'ヤサイ→ニンニク→アブラ→カラメ',
+          },
+          {
+            label: '退店ペナルティ',
+            value: `${rule.name}（スコア×${rule.scoreRate.toFixed(1)}）`,
+            note: rule.desc,
+            tone: rule.maxBreaks !== null ? 'warn' : 'normal',
+          },
+          { label: 'トッピング券', value: toppingNames.length ? toppingNames.join('・') : 'なし' },
+          { label: '操作', value: 'Esc：一時休戦', note: '結果画面：Space もう一杯 / Enter 番付へ' },
+        ]}
+        startLabel="修行開始"
+        backLabel="食券を選び直す"
+        onStart={start}
+        onBack={onQuit}
+      />
+    );
+  }
 
   return (
     <div className={`flex flex-col w-full pb-16 ${shake ? 'animate-jiro-shake' : ''}`}>

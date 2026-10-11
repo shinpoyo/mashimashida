@@ -20,7 +20,6 @@ export interface TicketConfig {
 export type ToppingEffect =
   | 'mistake_shield'
   | 'time_extend'
-  | 'score_multiplier'
   | 'combo_protect'
   | 'break_forgive';
 

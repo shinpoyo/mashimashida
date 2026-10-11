@@ -139,7 +139,7 @@ export default function App() {
           />
         )}
 
-        {currentScreen === 'call-master' && <CallMaster onGoToLeaderboard={() => setCurrentScreen('leaderboard')} />}
+        {currentScreen === 'call-master' && <CallMaster onGoToLeaderboard={() => setCurrentScreen('leaderboard')} onBack={() => setCurrentScreen('ticket-vending')} />}
 
         {currentScreen === 'leaderboard' && (
           <Leaderboard
