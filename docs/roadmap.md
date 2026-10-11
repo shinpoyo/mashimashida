@@ -51,7 +51,7 @@
 - [x] 公開先・ライセンスの決定（公開リポジトリ＋GitHub Pages、権利保持。[publishing.md](publishing.md)）
 - [x] `main` へのプルリクエスト作成
 - [x] マージ・リポジトリ公開・Pages の有効化 → https://shinpoyo.github.io/mashimashida/ で公開
-- [ ] 独自ドメイン（任意。[custom-domain.md](custom-domain.md)）
+- [ ] 独自ドメイン shinpoyo.com（案 A：個人サイト化で進行中。[custom-domain.md](custom-domain.md)）
 
 ## フェーズ4：全国完飲番付（オンライン化）
 

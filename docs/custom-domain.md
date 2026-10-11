@@ -21,6 +21,13 @@
 | A. 個人サイト化 | `shinpoyo.com/mashimashida/`、`shinpoyo.com/mashimashityping/` … | `shinpoyo/shinpoyo.github.io` リポジトリを作り、その Pages に `shinpoyo.com` を設定。公開中のプロジェクトのページが全部この下に移る |
 | B. ゲームごとにサブドメイン | `mashimashi.shinpoyo.com` | mashimashida リポジトリの Pages に設定。CNAME `mashimashi` → `shinpoyo.github.io` |
 
+**→ 2026-10-11 決定：案 A（個人サイト化）。** 個人サイトの中身と詳しい設定手順は `shinpoyo/shinpoyo.github.io` リポジトリの `docs/custom-domain.md` に置く。要点：
+
+1. GitHub アカウントの Settings → Pages → Add a domain で `shinpoyo.com` を所有確認（TXT レコード）
+2. Cloudflare DNS（すべて DNS only）：A `@` → 185.199.108.153 / .109.153 / .110.153 / .111.153、AAAA `@` → 2606:50c0:8000::153 〜 8003::153、CNAME `www` → shinpoyo.github.io
+3. `shinpoyo.github.io` リポジトリの Settings → Pages → Custom domain に `shinpoyo.com` → Enforce HTTPS（**必ず DNS 設定の後**。先にやると全プロジェクトが一時的に見られなくなる）
+4. このリポジトリの Actions →「Deploy to GitHub Pages」を再実行（OGP の URL が `https://shinpoyo.com/mashimashida/` になる）
+
 
 ## 1. ドメイン名を決める
 

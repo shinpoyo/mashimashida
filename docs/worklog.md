@@ -335,3 +335,14 @@
 - ユーザーが Cloudflare Registrar で **shinpoyo.com** を取得（RDAP で登録・期限 2027-10-11・Cloudflare ネームサーバーを確認。DNS レコードはまだなし）
 - Cloudflare の2要素認証の場所を案内（My Profile → Authentication）。公式ドキュメントで手順を確認
 - shinpoyo.com の使い方として「A. 個人サイト化（shinpoyo.com/各プロジェクト/）」「B. ゲームごとのサブドメイン」を整理し、[custom-domain.md](custom-domain.md) に追記
+
+---
+
+## 2026-10-11 案 A（個人サイト化）に着手
+
+- 方針決定：shinpoyo.com を個人サイトにし、各プロジェクトを `shinpoyo.com/<リポジトリ名>/` で配信
+- 個人サイト（`shinpoyo.github.io` リポジトリ）の中身を用意：作品一覧のトップページ・404・README・設定手順・作業履歴
+  - 一覧：マシマシ打・けしカス・もぐもぐカメラ。旧版 mashimashityping は「ラーメン二郎」表記が残るため載せない
+  - PC・スマホ幅で表示確認（横スクロールなし）
+- GitHub 上のリポジトリ作成は権限不足（403）でできなかったため、ユーザーに空リポジトリの作成を依頼。作成後に push する
+- [custom-domain.md](custom-domain.md) に決定事項と DNS の値を追記
