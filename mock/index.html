@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マシマシ打 統合モック</title>
+  <meta name="description" content="mashimashida のデザイン × mashimashityping のロジックを組み合わせた統合モック">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍜</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=JetBrains+Mono:wght@500;700;800&family=M+PLUS+1p:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="mock.css">
+</head>
+<body>
+  <!-- ===== ヘッダー（mashimashida デザイン） ===== -->
+  <header class="hdr">
+    <div class="marquee">
+      <div class="wrap marquee-in">
+        <span class="font-dela">⚠ ロット乱し厳禁 ・ 私語厳禁 ⚠</span>
+        <span class="marquee-r"><b class="league">JIRO-TYPING LEAGUE</b><span class="hide-sm">本日の営業: 昼の部 炎上中</span></span>
+      </div>
+    </div>
+    <div class="wrap nav-row">
+      <div class="brand" data-nav="ticket">
+        <div class="brand-face" id="brandFace"></div>
+        <div>
+          <div class="brand-name font-dela">マシマシ打</div>
+          <div class="brand-sub mono">RAMEN COMBAT TYPER</div>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button data-nav="ticket" class="on">食券購入</button>
+        <button data-nav="battle">タイピング修行</button>
+        <button data-nav="dojo" class="soon">コール道場</button>
+        <button data-nav="board">完飲番付</button>
+        <button data-nav="kitchen" class="soon">マイ厨房</button>
+      </nav>
+      <div class="hdr-tools">
+        <div class="cups"><span class="cups-l">通算完飲</span><span class="mono" id="cupCount">000</span>杯</div>
+        <button id="muteBtn" class="icon-btn" title="サウンド切替">🔊</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap main">
+    <!-- ===== 食券購入 ===== -->
+    <section id="scr-ticket" class="screen active">
+      <div class="strip">
+        <span class="tag-red">営業中</span>
+        <span class="font-dela strip-title">二郎直系 総本山タイピング道場</span>
+        <span class="strip-r hide-sm">食券を選んで <kbd>Enter</kbd> で着席</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="vm-head">
+            <div>
+              <div class="font-dela">🎫 食券売機</div>
+              <div class="mono tiny muted">AUTOMATIC TICKET VENDING SYSTEM</div>
+            </div>
+            <div class="coin"><span class="tiny">投入金額</span><b class="mono">¥ 1,500</b></div>
+          </div>
+
+          <div class="sec-label"><span class="bar"></span>主食券（難易度選択） <span class="sec-r">キー <kbd>1</kbd>〜<kbd>4</kbd> でも選択</span></div>
+          <div class="tickets" id="tickets">
+            <button class="ticket on" data-mode="easy">
+              <span class="t-badge yellow">青札・入門</span><span class="t-price mono">¥850</span>
+              <span class="t-name font-dela">小ラーメン</span>
+              <span class="t-desc">8ロット / 短いコール中心</span>
+              <span class="t-best mono" data-best="easy"></span>
+            </button>
+            <button class="ticket" data-mode="normal">
+              <span class="t-badge gold">黄札・本番</span><span class="t-price mono">¥950</span>
+              <span class="t-name font-dela">大ラーメン</span>
+              <span class="t-desc">10ロット / マシマシ解禁</span>
+              <span class="t-best mono" data-best="normal"></span>
+            </button>
+            <button class="ticket red" data-mode="hard">
+              <span class="t-badge red">赤札・猛者専用</span><span class="t-price mono">¥1,150</span>
+              <span class="t-name font-dela">全マシマシ</span>
+              <span class="t-desc">12ロット / 順不同・時間激短</span>
+              <span class="t-best mono" data-best="hard"></span>
+            </button>
+            <button class="ticket black" data-mode="super">
+              <span class="t-badge red">黒札・完食者限定</span><span class="t-price mono">¥1,300</span>
+              <span class="t-name font-dela">超ハード</span>
+              <span class="t-desc">丼の画像だけでコールを当てろ</span>
+              <span class="t-best mono" data-best="super"></span>
+            </button>
+          </div>
+
+          <details class="glossary">
+            <summary class="font-dela">📖 コール用語集</summary>
+            <dl>
+              <dt>ヤサイ</dt><dd>茹でたモヤシとキャベツ</dd>
+              <dt>ニンニク</dt><dd>刻みニンニク</dd>
+              <dt>アブラ</dt><dd>背脂</dd>
+              <dt>カラメ</dt><dd>カエシ追加で味濃いめ</dd>
+              <dt>マシ〜マシ×6</dt><dd>増量の段階</dd>
+              <dt>チョモランマ</dt><dd>限界突破盛り</dd>
+              <dt>スクナメ</dt><dd>少なめ</dd>
+              <dt>全マシ</dt><dd>全トッピングをマシ</dd>
+              <dt>そのままで</dt><dd>トッピングなし</dd>
+            </dl>
+            <p class="tiny muted">ローマ字は shi/si・tsu/tu・nn/n・っ（子音重ね/ltu）など一般的な表記に対応。</p>
+          </details>
+        </div>
+
+        <aside class="card spec">
+          <div class="spec-head">
+            <div>
+              <div class="tiny muted">選択中の食券仕様</div>
+              <div class="font-dela spec-name" id="specName">小ラーメン</div>
+            </div>
+            <span class="chip mono" id="specLots">8ロット</span>
+          </div>
+          <div class="spec-visual">
+            <div class="spec-bowl" id="specBowl"></div>
+            <div class="spec-note"><b class="font-dela">店主の目線:</b> <span id="specNote"></span></div>
+          </div>
+          <div class="kpis">
+            <div><span>ロット数</span><b class="mono" id="specK1">8</b></div>
+            <div><span>持ち時間</span><b class="mono pink" id="specK2">長め</b></div>
+            <div><span>コール順</span><b class="mono" id="specK3">定番順</b></div>
+          </div>
+          <button class="btn-go font-dela" id="startBtn">食券を握りしめて着席！修行開始 →</button>
+          <p class="tiny muted center">※Enterキーでも入店可。IMEはオフにしてください。</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===== タイピング修行 ===== -->
+    <section id="scr-battle" class="screen">
+      <div class="strip danger">
+        <span class="tag-red">🔥 LOT STATUS</span>
+        <span class="font-dela">食券：<span id="bMode">-</span></span>
+        <span class="strip-r">ロット乱し: <span id="breakDots"></span></span>
+      </div>
+
+      <div class="stats4">
+        <div class="stat"><span>ロット</span><b class="mono" id="hudLot">1/10</b><i>LOT</i></div>
+        <div class="stat"><span>スコア</span><b class="mono" id="hudScore">0</b><i>SCORE</i></div>
+        <div class="stat"><span>ミス</span><b class="mono pink" id="hudMiss">0</b><i>MISS</i></div>
+        <div class="stat"><span>連続正解</span><b class="mono" id="hudChain">0</b><i>CHAIN!</i></div>
+      </div>
+
+      <div class="card counter">
+        <div class="master">
+          <div class="master-ring" id="staffFace"></div>
+          <div class="master-meta">
+            <div class="font-dela yellow tiny">三田総本山直系・店主</div>
+            <div class="bubble" id="staffBubble">ニンニク入れますか？</div>
+            <div class="anger"><span class="tiny muted">激怒度</span><div class="anger-bar"><div id="angerBar"></div></div></div>
+          </div>
+        </div>
+        <div class="served">
+          <div class="served-ring" id="bowlWrap"></div>
+          <div class="tiny muted center">提供カウンター</div>
+        </div>
+      </div>
+
+      <div class="card callcard" id="callCard">
+        <div class="call-top">
+          <span class="lotno mono font-dela" id="lotNo">01 / 10</span>
+          <span class="font-dela" id="callLabel">あなたのコール</span>
+          <span class="call-r yellow font-dela" id="callHint"></span>
+        </div>
+        <div class="call-image" id="callImage">
+          <div class="target" id="callTarget"></div>
+          <div class="ref"><div id="callRef"></div><span class="tiny muted">基準：そのまま</span></div>
+        </div>
+        <div class="call-display font-dela" id="callDisplay"></div>
+        <div class="call-kana" id="callKana"></div>
+        <div class="romaji-box">
+          <div class="call-romaji mono" id="callRomaji"></div>
+          <div class="tiny muted center">⌨ そのままキーボードで直打ち（ローマ字揺れ対応）</div>
+        </div>
+        <div class="timer"><div class="timer-bar" id="timerBar"></div></div>
+        <div class="judge"><span class="tiny muted">直近判定:</span> <b class="font-dela yellow" id="judge">—</b></div>
+      </div>
+
+      <div class="card vkbd">
+        <div class="vk-head"><span class="tiny">⌨ リアルタイム打鍵アシスト</span><span class="tiny">NEXT KEY: <b class="mono nk" id="nextKey">-</b></span></div>
+        <div id="vk"></div>
+      </div>
+
+      <div class="card controls">
+        <span class="tiny muted mono">Esc: 中断して食券機へ</span>
+        <button class="btn-ghost font-dela" id="quitBtn">ギブアップ退店</button>
+      </div>
+
+      <div class="countdown font-dela" id="countdown"></div>
+      <div class="ime-warn" id="imeWarn">IMEがオンになっています。半角英数に切り替えてください。</div>
+    </section>
+
+    <!-- ===== 完飲番付（結果＋自己ベスト） ===== -->
+    <section id="scr-board" class="screen">
+      <div class="card result" id="resultCard">
+        <div class="res-head">
+          <div class="seal font-dela">番付<br><small class="mono">EST.2024</small></div>
+          <div>
+            <div class="tiny muted mono" id="resMode">食券：-</div>
+            <div class="tiny muted">あなたの称号</div>
+            <div class="font-dela rank" id="resRank">-</div>
+            <div class="muted" id="resComment"></div>
+          </div>
+        </div>
+        <div class="res-stats">
+          <div><span>スコア</span><b class="mono" id="resScore">-</b></div>
+          <div><span>打鍵/秒</span><b class="mono" id="resKps">-</b></div>
+          <div><span>正確率</span><b class="mono" id="resAcc">-</b></div>
+          <div><span>ミス</span><b class="mono pink" id="resMiss">-</b></div>
+          <div><span>ロット乱し</span><b class="mono pink" id="resBreak">-</b></div>
+          <div><span>最速コール</span><b class="mono" id="resFast">-</b></div>
+        </div>
+        <div class="newbest font-dela" id="resBest">🏆 自己ベスト更新！</div>
+        <div class="res-actions">
+          <button class="btn-go font-dela" id="retryBtn">もう一杯（Space）</button>
+          <button class="btn-ghost font-dela" id="shareBtn">𝕏 で戦績咆哮</button>
+          <button class="btn-ghost font-dela" id="backBtn">食券機に戻る（Esc）</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-label"><span class="bar"></span>自己ベスト番付（この端末）</div>
+        <table class="board">
+          <thead><tr><th>食券</th><th>自己ベスト</th><th>番付</th></tr></thead>
+          <tbody id="bestTable"></tbody>
+        </table>
+        <p class="tiny muted">※全国番付（オンラインランキング）は本実装フェーズで検討。</p>
+      </div>
+    </section>
+
+    <!-- ===== 準備中画面 ===== -->
+    <section id="scr-soon" class="screen">
+      <div class="card center soon-card">
+        <div class="font-dela big yellow" id="soonTitle">準備中</div>
+        <p class="muted">この画面は mashimashida 側のデザインを本実装フェーズで移植予定です（モックでは省略）。</p>
+        <button class="btn-go font-dela" data-nav="ticket">食券機へ戻る</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <span class="font-dela yellow">マシマシ打</span> <span class="chip mono">MOCK v0.1</span>
+      <p class="tiny muted">デザイン: mashimashida ／ ロジック: mashimashityping ／ ※非公式ファンメイド作品。ラーメン二郎および関係店舗とは一切関係ありません。</p>
+    </div>
+  </footer>
+
+  <script src="engine/romaji.js"></script>
+  <script src="engine/master.js"></script>
+  <script src="engine/bowl.js"></script>
+  <script src="mock.js"></script>
+</body>
+</html>
