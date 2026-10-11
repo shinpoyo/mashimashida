@@ -2,13 +2,12 @@ import React, { useState, useEffect, useRef, useCallback, useReducer } from 'rea
 import confetti from 'canvas-confetti';
 import { GameResult, GameSettings } from '../types/game';
 import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_BY_ID, toppingValue } from '../data/shop';
-import { MODES, makeCalls, pick, QUESTIONS, DEFAULT_LV, EMPTY_BOWL, type Call, type ToppingLevels } from '../engine/calls';
+import { MODES, makeCalls, pick, QUESTIONS, DEFAULT_LV, type Call } from '../engine/calls';
 import { Typer, MultiTyper, type CallTyper } from '../engine/romaji';
 import { lotScore, judgeRank } from '../engine/scoring';
-import type { MasterMood } from '../engine/master';
 import { soundManager } from '../utils/audio';
 import { VirtualKeyboard } from './VirtualKeyboard';
-import { BowlView, MasterFace } from './JiroArt';
+import { BowlView, ChefPhoto, RamenPhoto, type ChefMood } from './JiroArt';
 
 interface TypingBattleProps {
   settings: GameSettings;
@@ -76,10 +75,11 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const [phase, setPhase] = useState<Phase>('countdown');
   const [countdown, setCountdown] = useState<number>(3);
   const [paused, setPaused] = useState<boolean>(false);
-  const [mood, setMood] = useState<MasterMood>('wait');
+  const [mood, setMood] = useState<ChefMood>('wait');
   const [bubble, setBubble] = useState<string>('食券を拝見します');
   const [bubbleKey, setBubbleKey] = useState<number>(0);
-  const [servedLv, setServedLv] = useState<ToppingLevels>(EMPTY_BOWL);
+  /** 提供カウンターの丼の状態 */
+  const [counter, setCounter] = useState<'cooking' | 'served' | 'ng'>('cooking');
   const [serveKey, setServeKey] = useState<number>(0);
   const [cardState, setCardState] = useState<'' | 'ok' | 'ng'>('');
   const [revealed, setRevealed] = useState<string>('');
@@ -108,7 +108,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     phaseRef.current = p;
     setPhase(p);
   };
-  const say = (text: string, m: MasterMood) => {
+  const say = (text: string, m: ChefMood) => {
     setBubble(text);
     setMood(m);
     setBubbleKey((k) => k + 1);
@@ -188,7 +188,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       s.limit = cfg.base + cfg.perKey * s.typer.rest().length + timeBonus;
     }
     say(pick(QUESTIONS), 'normal');
-    setServedLv(EMPTY_BOWL);
+    setCounter('cooking');
     setCardState('');
     setRevealed('');
     s.lotStart = performance.now();
@@ -221,7 +221,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     if (cfg.super) setRevealed(`正解！ ${call.display}`);
     setVerdict(remain / s.limit > 0.5 ? pick(VERDICTS) : 'GOOD CALL');
     say(`${pick(['はい', 'はーい', 'あいよ', 'はい、どうぞ'])}（+${gained}）`, 'success');
-    setServedLv(call.lv);
+    setCounter('served');
     setServeKey((k) => k + 1);
     s.idx++;
     rerender();
@@ -250,6 +250,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       s.chain = 0;
     }
     setVerdict(`ロット乱し！${note}`);
+    setCounter('ng');
     say('ロットが乱れました…', 'stern');
     s.idx++;
     rerender();
@@ -296,7 +297,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     setResult(null);
     setPaused(false);
     pausedRef.current = false;
-    setServedLv(EMPTY_BOWL);
+    setCounter('cooking');
     setCardState('');
     setRevealed('');
     setVerdict('—');
@@ -483,10 +484,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
           <div className="md:col-span-6 flex items-center gap-4">
             <div className="relative shrink-0">
-              <MasterFace
-                mood={mood}
-                className={`w-24 h-24 rounded-full overflow-hidden bg-[#2a2018] ring-4 shadow-xl ${mood === 'stern' ? 'ring-[#970015] animate-rage' : 'ring-[#ffe100]'}`}
-              />
+              <ChefPhoto mood={mood} className="w-24 h-24 rounded-full" />
             </div>
             <div className="flex flex-col flex-1 min-w-0">
               <div className="flex items-center gap-2">
@@ -506,10 +504,43 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
           </div>
 
           <div className="md:col-span-3 flex flex-col items-center justify-center">
-            <div className="w-32 h-32 rounded-full border-4 border-[#ffe100] overflow-hidden flex items-end justify-center bg-[radial-gradient(circle_at_50%_60%,#3a2a1c,#120e0b)]">
-              <BowlView key={serveKey} lv={servedLv} seed={s.idx} className="w-[92%] animate-serve" />
+            <div className="relative w-36 h-36 flex items-center justify-center">
+              {/* 提供ゲージ（提供杯数 / ロット数） */}
+              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="46" stroke="#353534" strokeWidth="6" fill="transparent" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="46"
+                  stroke="#ffe100"
+                  strokeWidth="6"
+                  fill="transparent"
+                  strokeDasharray="289"
+                  strokeDashoffset={289 - (289 * s.served) / cfg.lots}
+                  strokeLinecap="round"
+                  className="transition-all duration-300"
+                />
+              </svg>
+              <div
+                key={serveKey}
+                className={`absolute inset-2.5 rounded-full overflow-hidden border-2 ${
+                  counter === 'ng' ? 'border-[#970015]' : 'border-[#ffe100]'
+                } ${counter === 'served' ? 'animate-serve' : ''}`}
+              >
+                <RamenPhoto
+                  className={`w-full h-full transition-all duration-300 ${
+                    counter === 'cooking' ? 'brightness-50 saturate-50' : counter === 'ng' ? 'grayscale brightness-75' : ''
+                  }`}
+                  position="49% 60%"
+                />
+                {counter !== 'served' && (
+                  <span className={`absolute inset-x-0 bottom-3 text-center font-dela text-[11px] drop-shadow-[1px_1px_0_#000] ${counter === 'ng' ? 'text-[#ff5555]' : 'text-[#ffe100]'}`}>
+                    {counter === 'ng' ? 'ロット乱し' : '調理中…'}
+                  </span>
+                )}
+              </div>
             </div>
-            <span className="mt-1 text-[10px] text-[#cec6aa] font-bold">提供カウンター（{s.served}杯）</span>
+            <span className="mt-1 text-[10px] text-[#cec6aa] font-bold">提供カウンター（{s.served}/{cfg.lots}杯）</span>
           </div>
 
           <div className="md:col-span-3 flex flex-col gap-1.5 text-xs font-bold bg-[#0e0e0e] p-3 rounded-lg border border-[#353534]">

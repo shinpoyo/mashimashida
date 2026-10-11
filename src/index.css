@@ -95,9 +95,8 @@
   animation: rage-pulse 1.2s infinite ease-in-out;
 }
 
-/* ---------- SVG 丼・店主（mashimashityping から移植） ---------- */
-.jiro-bowl svg,
-.jiro-master svg {
+/* ---------- SVG 丼（超ハード出題用・mashimashityping から移植） ---------- */
+.jiro-bowl svg {
   width: 100%;
   height: 100%;
   display: block;
@@ -114,22 +113,11 @@
   50% { transform: translateY(-10px) scaleX(1.12); opacity: 0.8; }
   100% { transform: translateY(-22px) scaleX(0.88); opacity: 0.2; }
 }
-.master-svg.mood-normal { animation: masterBreathe 2.4s ease-in-out infinite alternate; }
-@keyframes masterBreathe {
+.animate-chef-nod { animation: chefNod 0.5s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes chefNod {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-4px); }
-}
-.master-svg.mood-success { animation: masterNod 0.5s cubic-bezier(.2, 1.6, .4, 1); }
-@keyframes masterNod {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px) scale(1.06); }
+  50% { transform: translateY(-6px) scale(1.05); }
   100% { transform: translateY(0); }
-}
-.master-svg.mood-stern { animation: masterAngry 0.4s ease; }
-@keyframes masterAngry {
-  0%, 100% { transform: none; }
-  25% { transform: translateX(-4px) rotate(-2deg); }
-  75% { transform: translateX(4px) rotate(2deg); }
 }
 
 .animate-serve { animation: serve 0.45s cubic-bezier(.2, 1.6, .4, 1); }

@@ -3,7 +3,7 @@
 ラーメン二郎風「コール」特化タイピングゲーム。
 「ニンニク入れますか？」――店主の問いかけに、迷わず即答せよ。
 
-- **デザイン**：mashimashida（React 版）のダーク×二郎イエロー UI
+- **デザイン**：mashimashida（React 版）のダーク×二郎イエロー UI、写真の丼・店主
 - **ロジック**：[mashimashityping](https://github.com/shinpoyo/mashimashityping) のローマ字判定・コール生成・SVG 丼描画を TypeScript に移植
 
 > キーボードでのプレイ前提です（スマホ非対応）。
@@ -56,8 +56,8 @@ src/
     romaji.ts    ローマ字判定（Typer / MultiTyper）
     calls.ts     コール生成・難易度設定・超ハードの正解列挙
     scoring.ts   採点・称号
-    bowl.ts      丼の SVG 生成（トッピング量 0〜9 段階）
-    master.ts    店主の表情 SVG
+    bowl.ts      丼の SVG 生成（超ハードの出題用。トッピング量 0〜9 段階）
+  assets/images/ 丼・店主・ロゴの写真（AI Studio 版の画像をリポジトリ内に保存）
   data/shop.ts   食券・トッピング券・退店ペナルティ
   components/    画面（食券購入 / タイピング修行 / コール道場 / 完飲番付 / マイ厨房）
 tests/           エンジンのテスト

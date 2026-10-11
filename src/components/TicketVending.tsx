@@ -1,23 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, GameSettings, PenaltyId, UserStats } from '../types/game';
 import { TICKET_CONFIGS, TOPPING_BUFFS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER } from '../data/shop';
-import { MODES, type ToppingLevels } from '../engine/calls';
+import { MODES } from '../engine/calls';
 import { soundManager } from '../utils/audio';
-import { BowlView } from './JiroArt';
+import { RamenPhoto } from './JiroArt';
 
 interface TicketVendingProps {
   initialSettings: GameSettings;
   bestScores: UserStats['bestScores'];
   onStartGame: (settings: GameSettings) => void;
 }
-
-/** 食券ごとのプレビュー丼 */
-const PREVIEW_LV: Record<GameMode, ToppingLevels> = {
-  easy: { yasai: 3, ninniku: 2, abura: 0, karame: 1 },
-  normal: { yasai: 4, ninniku: 3, abura: 3, karame: 2 },
-  hard: { yasai: 9, ninniku: 6, abura: 6, karame: 4 },
-  super: { yasai: 5, ninniku: 4, abura: 3, karame: 3 },
-};
 
 const TONE_STYLES = {
   yellow: { badge: 'bg-[#ffe100] text-[#0e0e0e]', name: 'text-[#ffffff]', price: 'text-[#ffe100]', on: 'border-[#ffe100] shadow-[0_0_12px_rgba(255,225,0,0.3)]', hover: 'hover:border-[#ffe100]', bg: 'bg-[#3a3939]' },
@@ -273,9 +265,10 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
               </span>
             </div>
 
-            {/* Ramen preview (SVG) */}
-            <div className="relative w-full h-56 rounded-xl overflow-hidden shadow-md border border-[#353534] bg-[radial-gradient(ellipse_at_50%_70%,#3a2a1c_0%,#1a1410_60%,#0e0e0e_100%)]">
-              <BowlView lv={PREVIEW_LV[selectedMode]} seed={88} className="absolute inset-x-0 bottom-6 mx-auto w-56 h-auto" />
+            {/* Ramen Image Container */}
+            <div className="relative w-full h-52 sm:h-56 rounded-xl overflow-hidden shadow-md group border border-[#353534]">
+              <RamenPhoto className="w-full h-full group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-90" />
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-[#0e0e0e]/90 backdrop-blur-sm p-2.5 rounded-lg border border-[#353534]">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#ffb3ae] text-lg">psychology_alt</span>

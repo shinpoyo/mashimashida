@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserStats, ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
-import { MasterFace } from './JiroArt';
+import { ChefPhoto } from './JiroArt';
 import { TICKET_CONFIGS } from '../data/shop';
 
 interface MyKitchenProps {
@@ -44,7 +44,7 @@ export const MyKitchen: React.FC<MyKitchenProps> = ({ userStats, onNavigate, onU
       <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-5 shadow-xl mb-6 flex flex-col md:flex-row items-center justify-between gap-5">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <MasterFace mood="success" className="w-20 h-20 rounded-full overflow-hidden bg-[#2a2018] ring-4 ring-[#ffe100] shadow-xl" />
+            <ChefPhoto mood="normal" className="w-20 h-20 rounded-full" />
             <span className="absolute -bottom-1 -right-1 bg-[#ffe100] text-[#0e0e0e] text-[10px] font-dela px-1.5 py-0.5 rounded shadow">
               LV.{1 + Math.floor(userStats.bowlsCleared / 3)}
             </span>

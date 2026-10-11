@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
-import { MasterFace } from './JiroArt';
+import { ChefPhoto, logoImg } from './JiroArt';
 
 interface HeaderProps {
   currentScreen: ScreenType;
@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
           className="flex items-center gap-3 shrink-0 cursor-pointer select-none"
           onClick={() => onNavigate('ticket-vending')}
         >
-          <MasterFace mood="normal" className="h-10 w-10 rounded-full overflow-hidden bg-[#2a2018] ring-2 ring-[#ffe100]" />
+          <img alt="マシマシ打 看板ロゴ" className="h-9 w-auto object-contain rounded-sm" src={logoImg} draggable={false} />
           <div className="flex flex-col">
             <span className="font-dela text-lg text-[#ffe100] tracking-wider leading-none drop-shadow-[2px_2px_0_#000000]">
               マシマシ打
@@ -188,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
               onClick={() => onNavigate('my-kitchen')}
               title="マイ厨房を開く"
             >
-              <MasterFace mood="wait" className="w-8 h-8 rounded-full overflow-hidden bg-[#2a2018] ring-2 ring-[#ffe100] shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
+              <ChefPhoto mood="normal" className="w-8 h-8 rounded-full" ringClass="ring-2" />
               <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#970015] border border-[#0e0e0e] rounded-full" />
             </div>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
-import { MasterFace, BowlView } from './JiroArt';
+import { ChefPhoto, RamenPhoto } from './JiroArt';
 
 interface CallMasterProps {
   onGoToLeaderboard: () => void;
@@ -313,14 +313,14 @@ export const CallMaster: React.FC<CallMasterProps> = ({ onGoToLeaderboard }) => 
             {/* Chef portrait & ramen bowl preview */}
             <div className="flex items-center gap-4 pt-2">
               <div className="relative group">
-                <MasterFace mood="stern" className="w-24 h-24 rounded-lg overflow-hidden bg-[#2a2018] border-2 border-[#970015] shadow-lg" />
+                <ChefPhoto mood="stern" className="w-24 h-24 rounded-lg" ringClass="ring-2" />
                 <span className="absolute bottom-1 left-1 bg-[#970015] text-[#ffdad7] text-[9px] font-dela px-1 rounded">
                   頑固店主・二郎魂
                 </span>
               </div>
 
               <div className="relative group">
-                <BowlView lv={{ yasai: 4, ninniku: 3, abura: 3, karame: 2 }} seed={7} className="w-24 h-24 rounded-lg overflow-hidden bg-[#1a1410] border-2 border-[#ffe100] shadow-lg" />
+                <RamenPhoto className="w-24 h-24 rounded-lg border-2 border-[#ffe100] shadow-lg" />
                 <span className="absolute bottom-1 left-1 bg-[#ffe100] text-[#0e0e0e] text-[9px] font-dela px-1 rounded">
                   カウンター直撃
                 </span>
