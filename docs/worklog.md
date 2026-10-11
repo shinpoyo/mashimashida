@@ -346,3 +346,18 @@
   - PC・スマホ幅で表示確認（横スクロールなし）
 - GitHub 上のリポジトリ作成は権限不足（403）でできなかったため、ユーザーに空リポジトリの作成を依頼。作成後に push する
 - [custom-domain.md](custom-domain.md) に決定事項と DNS の値を追記
+
+---
+
+## 2026-10-11 独自ドメイン shinpoyo.com へ移行
+
+- ユーザーが `shinpoyo/shinpoyo.github.io` を作成 → 個人サイトを push（詳細はそちらの `docs/worklog.md`）
+- ユーザーが Cloudflare DNS（所有確認 TXT・A×4・AAAA×4・CNAME www）、Custom domain、Enforce HTTPS を設定
+- 確認（DoH・curl）：
+  - DNS は A / AAAA / CNAME とも正しい値
+  - `https://shinpoyo.com/`・`/mashimashida/`・`/keshikasu/`・`/mogumogu-camera/`・`/smudge-privacy/` すべて 200（証明書も有効）
+  - `https://www.shinpoyo.com/` → `https://shinpoyo.com/`、`https://shinpoyo.github.io/mashimashida/` → `https://shinpoyo.com/mashimashida/` に 301 転送
+- 「Deploy to GitHub Pages」を手動実行 → OGP の URL が `http://shinpoyo.com/...`（http）になった
+  - 原因：`configure-pages` の `base_url` が http を返した（HTTPS 強制が反映される前のため）
+  - 対応：workflow で `https://` に揃えてから `SITE_URL` に渡すよう修正（main に入ったら再デプロイで直る）
+- README・publishing.md・custom-domain.md・roadmap のプレイ URL を `https://shinpoyo.com/mashimashida/` に更新

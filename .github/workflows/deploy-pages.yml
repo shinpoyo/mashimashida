@@ -31,9 +31,10 @@ jobs:
       - id: pages
         uses: actions/configure-pages@v5
       # OGP（共有カード画像）用に公開 URL を渡す
-      - run: bun run build
+      # 独自ドメインで HTTPS の強制が反映される前は base_url が http:// になるため、https:// に揃える
+      - run: SITE_URL="https://${BASE_URL#*://}/" bun run build
         env:
-          SITE_URL: ${{ steps.pages.outputs.base_url }}/
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -1,6 +1,6 @@
 # 独自ドメインの取得と設定
 
-現在の公開 URL：`https://shinpoyo.github.io/mashimashida/`（2026-10-11 公開）
+現在の公開 URL：`https://shinpoyo.com/mashimashida/`（2026-10-11 独自ドメイン設定済み。旧 URL `https://shinpoyo.github.io/mashimashida/` からは自動転送）
 
 ## 取得済み（2026-10-11）
 
