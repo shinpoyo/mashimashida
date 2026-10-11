@@ -40,6 +40,7 @@ bun run dev        # http://localhost:3000
 bun run lint       # 型チェック（tsc --noEmit）
 bun run test       # エンジンのユニットテスト（bun test）
 bun run build      # dist/ に出力
+SITE_URL=https://example.com/ bun run build   # 共有カード（OGP）付きでビルド
 ```
 
 ### 構成
@@ -69,6 +70,7 @@ mock/            統合前の静的モック（参考）
 - [作業履歴](docs/worklog.md)
 - [コンプライアンスチェック](docs/compliance.md)
 - [ラーメン画像の差分計画](docs/image-variants.md)
+- [公開手順](docs/publishing.md)
 
 ## 免責
 

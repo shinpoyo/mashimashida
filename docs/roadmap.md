@@ -45,10 +45,11 @@
 
 ## フェーズ3：公開
 
-- [ ] GitHub Pages へのデプロイ（GitHub Actions で `vite build` → Pages）
-  - リポジトリ設定で Pages のソースを「GitHub Actions」にする必要あり
-  - `vite.config.ts` に `base: '/mashimashida/'` を設定
-- [ ] OGP 画像
+- [x] ビルドを相対パス化（どのホスティングでも動く）
+- [x] OGP 画像（`public/ogp.jpg`）と `SITE_URL` による共有カードの出力
+- [x] CI（型チェック・テスト・ビルド）と GitHub Pages デプロイの workflow
+- [ ] 公開先・ライセンスの決定（[publishing.md](publishing.md)）
+- [ ] `main` へのマージと Pages の有効化
 
 ## フェーズ4：全国完飲番付（オンライン化）
 

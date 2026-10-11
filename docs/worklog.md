@@ -274,3 +274,26 @@
 
 ### 検証
 - `tsc` / `bun test` / E2E（JS エラーなし）
+
+---
+
+## 2026-10-11 公開の準備
+
+### 依頼
+- 「公開の準備」を進める
+
+### 調査結果
+- `shinpoyo/mashimashida` は**非公開リポジトリ**。無料プランでは非公開リポジトリを GitHub Pages で公開できない
+- `main` へのプルリクエストはまだない（作業は全て `claude/peaceful-shannon-j91m6m` ブランチ）
+
+### 作業内容（公開先に依存しない準備）
+1. **ビルド設定**：`vite.config.ts` を `base: './'`（相対パス）に。`__dirname` を `import.meta.dirname` に置き換え（Vite の警告解消）
+2. **共有カード（OGP）**：`public/ogp.jpg`（1200×630、店の写真＋ロゴ＋「ニンニク入れますか？」）を作成。ビルド時の環境変数 `SITE_URL` で `og:url` / `og:image` / `twitter:image` を出力し、未指定なら出力しない
+3. **CI**：`.github/workflows/ci.yml`（型チェック・テスト・ビルド）
+4. **Pages デプロイ**：`.github/workflows/deploy-pages.yml`（`main` へのプッシュで公開。公開 URL を `SITE_URL` に自動設定）
+5. **手順書**：[publishing.md](publishing.md)（公開先の選択肢 A〜D と手順、公開前に決めること）
+
+### 検証
+- `bun install --frozen-lockfile`（CI と同じ条件）・`tsc`・ビルド成功
+- `SITE_URL` 指定時のみ OGP タグが入ることを確認
+- `/mashimashida/` のサブパスで配信してプレイ開始まで動作（画像読み込み・JS エラーなし）
