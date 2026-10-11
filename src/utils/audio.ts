@@ -380,28 +380,6 @@ class SoundManager {
     this.tone(660, t, 0.12, { type: 'triangle', vol: 0.2 });
     this.tone(440, t + 0.1, 0.18, { type: 'triangle', vol: 0.2 });
   }
-
-  // ---------------------------------------------------------------------------
-  // 旧 API 名（コール道場などの既存コンポーネント向け）
-  // ---------------------------------------------------------------------------
-  public playKeyStroke() {
-    this.keyStroke();
-  }
-  public playMistake() {
-    this.mistake();
-  }
-  public playCriticalHit() {
-    this.go();
-  }
-  public playSlurp() {
-    this.serve();
-  }
-  public playVictory() {
-    this.victory();
-  }
-  public playWarning() {
-    this.tick();
-  }
 }
 
 export const soundManager = new SoundManager();

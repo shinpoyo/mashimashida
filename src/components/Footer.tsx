@@ -28,12 +28,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             食券売場
           </button>
           <button
-            onClick={() => onNavigate('call-master')}
-            className="hover:text-[#ffe100] transition-colors cursor-pointer"
-          >
-            コール道場
-          </button>
-          <button
             onClick={() => onNavigate('leaderboard')}
             className="hover:text-[#ffe100] transition-colors cursor-pointer"
           >

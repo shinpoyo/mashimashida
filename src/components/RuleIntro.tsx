@@ -10,7 +10,7 @@ export interface RuleRow {
 }
 
 interface RuleIntroProps {
-  /** 画面名（タイピング修行・コール道場） */
+  /** 画面名（タイピング修行） */
   eyebrow: string;
   title: string;
   /** 店主のひとこと */

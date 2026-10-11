@@ -9,7 +9,6 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { TicketVending } from './components/TicketVending';
 import { TypingBattle } from './components/TypingBattle';
-import { CallMaster } from './components/CallMaster';
 import { Leaderboard } from './components/Leaderboard';
 import { RegularCard } from './components/RegularCard';
 import { TICKET_CONFIGS, MODE_ORDER } from './data/shop';
@@ -171,8 +170,6 @@ export default function App() {
         {currentScreen === 'ticket-vending' && (
           <TicketVending initialSettings={settings} bestScores={userStats.bestScores} onStartGame={handleStartGame} active={!battleOpen} />
         )}
-
-        {currentScreen === 'call-master' && <CallMaster onGoToLeaderboard={() => setCurrentScreen('leaderboard')} onBack={() => setCurrentScreen('ticket-vending')} />}
 
         {currentScreen === 'leaderboard' && (
           <Leaderboard

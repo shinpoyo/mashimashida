@@ -1,6 +1,6 @@
 import type { PlayerAvatar } from '../data/player';
 
-export type ScreenType = 'ticket-vending' | 'call-master' | 'leaderboard' | 'regular-card';
+export type ScreenType = 'ticket-vending' | 'leaderboard' | 'regular-card';
 
 /** ゲームモード（mashimashityping の4モード） */
 export type GameMode = 'easy' | 'normal' | 'hard' | 'super';

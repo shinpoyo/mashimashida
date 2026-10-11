@@ -55,7 +55,7 @@ src/
 assets-src/      画像の元データ（食券別写真の生成元）
 scripts/         画像生成スクリプト（make_ticket_photos.py）
   data/shop.ts   食券・退店ペナルティ
-  components/    画面（食券購入 / コール道場 / 完飲番付 / 常連カード）と、タイピング修行のポップアップ
+  components/    画面（食券購入 / 完飲番付 / 常連カード）と、タイピング修行のポップアップ
   data/player.ts プレイヤー（常連客）の名前・アイコン
 tests/           エンジンのテスト
 docs/            統合分析・作業履歴・ロードマップ

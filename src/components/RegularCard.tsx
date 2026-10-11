@@ -266,13 +266,6 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
                 {favoriteCall}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => onNavigate('call-master')}
-              className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#353534] text-[#ffffff] font-dela text-xs rounded-lg cursor-pointer"
-            >
-              道場で練習
-            </button>
           </div>
         )}
       </div>
