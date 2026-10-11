@@ -15,12 +15,12 @@
 
 ## あなたが行う作業（GitHub の画面で）
 
-1. **プルリクエストをマージ**（CI が緑になっていることを確認）
-2. **リポジトリを公開**：Settings → General → 一番下の Danger Zone → **Change repository visibility** → Public
-3. **Pages を有効化**：Settings → Pages → Build and deployment → Source を **GitHub Actions**
-4. **Actions** タブ → 「Deploy to GitHub Pages」→ **Run workflow**（main）で初回デプロイ
-   - 以降は main に入るたびに自動で公開される
-5. 数分後に `https://shinpoyo.github.io/mashimashida/` を開いて確認
+1. **リポジトリを公開**：Settings → General → 一番下の Danger Zone → **Change repository visibility** → Public
+2. **Pages を有効化**：Settings → Pages → Build and deployment → Source を **GitHub Actions**
+3. **プルリクエストをマージ**（CI が緑になっていることを確認）。マージすると「Deploy to GitHub Pages」が自動で動く
+   - 先にマージした場合はデプロイが失敗するので、1・2 の後に Actions タブ →「Deploy to GitHub Pages」→ **Run workflow**（main）で再実行
+4. 以降は main に入るたびに自動で公開される
+5. デプロイ完了後に `https://shinpoyo.github.io/mashimashida/` を開いて確認
 
 > 公開前のおすすめ確認：[compliance.md](compliance.md) の C（AI 生成画像の利用条件）
 
