@@ -311,3 +311,19 @@
 - 「ラーメン二郎」表記が残る統合前のモック `mock/` を削除（Git 履歴から復元可能）
 - CI 初回実行：成功（型チェック・テスト・ビルド）
 - [publishing.md](publishing.md) にオーナー作業（マージ → 公開設定 → Pages 有効化 → 初回デプロイ）を記載
+
+---
+
+## 2026-10-11 公開完了・独自ドメインの調査
+
+### 依頼
+- PR をマージした。ドメイン取得について教えてほしい
+
+### 確認
+- 「Deploy to GitHub Pages」成功。https://shinpoyo.github.io/mashimashida/ が 200 を返し、og:image も公開 URL で出力されている
+- 公開サイトをブラウザで開き、食券購入 → ルール説明 → プレイ開始まで動作（JS エラー・読み込み失敗なし）
+
+### 作業内容
+- [custom-domain.md](custom-domain.md) を作成：ドメイン名の候補と空き状況（RDAP で確認）、登録業者の比較、GitHub Pages への設定手順（所有確認・DNS・Custom domain・HTTPS）、アプリ側は変更不要であること
+- README にプレイ URL、publishing.md・roadmap に公開済みを反映
+- 作業ブランチは PR #1 マージ後の main から作り直した
