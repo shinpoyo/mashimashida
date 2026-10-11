@@ -6,6 +6,10 @@ on:
     branches-ignore: [main]
   pull_request:
 
+# 読み取りだけで足りるので、自動で渡されるトークンの権限を最小にする
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest

@@ -362,3 +362,14 @@
   - 対応：workflow で `https://` に揃えてから `SITE_URL` に渡すよう修正（main に入ったら再デプロイで直る）
 - README・publishing.md・custom-domain.md・roadmap のプレイ URL を `https://shinpoyo.com/mashimashida/` に更新
 - PR #2 マージ → 自動デプロイで OGP（`og:url`・`og:image`・`twitter:image`）が `https://shinpoyo.com/mashimashida/` になったことを確認。`ogp.jpg` も 200
+
+---
+
+## 2026-10-11 セキュリティチェックと告知ポスト案
+
+- ユーザーが `http://shinpoyo.com` → `https://` への転送を確認
+- セキュリティチェックを実施し [security.md](security.md) にまとめた：重大な問題なし
+  - DNS（ワイルドカードなし・所有確認済み）、移管ロック、登録者情報の非公開（国・都道府県のみ公開）、機密情報・個人情報なし、`bun audit` 0 件、XSS の入口なし
+  - CI の workflow に `permissions: contents: read` を追加（トークン権限の最小化）
+  - おすすめ（ユーザー作業）：なりすましメール対策（SPF `-all`・DMARC reject・Null MX）、CAA、DNSSEC、GitHub の2要素認証、ドメインの自動更新
+- X 用の告知ポスト案 3 本を [promotion.md](promotion.md) に作成（文字数確認済み、二郎系の語は不使用）
