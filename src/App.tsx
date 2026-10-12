@@ -203,6 +203,7 @@ export default function App() {
               onRecord={handleRecord}
               onShowBoard={() => handleNavigate('leaderboard')}
               onQuit={closeBattle}
+              player={{ name: userStats.playerName, avatar: userStats.avatar }}
             />
           </div>
         </div>

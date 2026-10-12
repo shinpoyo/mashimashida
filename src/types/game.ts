@@ -1,4 +1,4 @@
-import type { PlayerAvatar } from '../data/player';
+import type { PlayerAvatar } from '../data/playerPresets';
 
 export type ScreenType = 'ticket-vending' | 'leaderboard' | 'regular-card';
 

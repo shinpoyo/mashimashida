@@ -53,11 +53,12 @@
 - [x] マージ・リポジトリ公開・Pages の有効化 → https://shinpoyo.github.io/mashimashida/ で公開
 - [x] 独自ドメイン shinpoyo.com（案 A：個人サイト化 → https://shinpoyo.com/mashimashida/ 。[custom-domain.md](custom-domain.md)）
 
-## フェーズ4：全国完飲番付（オンライン化）
+## フェーズ4：全国完飲番付（オンライン化）（2026-10-12）
 
-- [ ] ランキング保存先の選定（Firebase / Supabase など）
-- [ ] 不正対策（サーバー側でのスコア検証など）
-- [ ] 名前登録・番付表示
+- [x] ランキング保存先の選定 → Cloudflare Workers + D1（[ranking.md](ranking.md)）
+- [x] 不正対策（シードからの出題再現・打鍵記録の再生による採点のやり直し・人間らしさの検査・連投制限）
+- [x] 名前登録（常連カードの名前・NG ワード）・番付表示（食券 × 日間/週間/月間/歴代）
+- [ ] Cloudflare の API トークン登録とデプロイ（ユーザー作業。[ranking.md](ranking.md) の設定手順）
 
 ## 検討メモ
 

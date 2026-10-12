@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { RANKING_ENABLED, rankingOptIn, setRankingOptIn } from '../utils/ranking';
 import { AdSlot } from './AdSlot';
 import { UserStats, ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
@@ -17,6 +18,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
   const [isEditingCall, setIsEditingCall] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [editingProfile, setEditingProfile] = useState<boolean>(false);
+  const [optIn, setOptIn] = useState<boolean>(rankingOptIn);
   const [nameDraft, setNameDraft] = useState<string>(userStats.playerName);
   const [avatarError, setAvatarError] = useState<string>('');
 
@@ -144,6 +146,23 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
                 className="w-full bg-[#0e0e0e] border-2 border-[#4c4732] focus:border-[#ffe100] rounded-lg px-3 py-2 text-[#ffe100] font-dela text-sm outline-none"
               />
               <p className="mt-1.5 text-[11px] text-[#cec6aa] font-bold">あなたはお店に通う常連客です。店主（写真の人）とは別人です。</p>
+              {RANKING_ENABLED && (
+                <label className="mt-3 flex items-start gap-2 text-[11px] text-[#cec6aa] font-bold cursor-pointer">
+                  <input
+                    id="rankingOptIn"
+                    type="checkbox"
+                    className="mt-0.5 accent-[#ffe100]"
+                    checked={optIn}
+                    onChange={(e) => {
+                      setRankingOptIn(e.target.checked);
+                      setOptIn(e.target.checked);
+                    }}
+                  />
+                  <span>
+                    全国完飲番付に参加する（遊び終わると、この名前・絵文字のアイコン・スコアが公開されます。画像のアイコンは送られません）
+                  </span>
+                </label>
+              )}
             </div>
             <div>
               <span className="block text-xs font-bold text-[#cec6aa] mb-1.5">アイコン</span>

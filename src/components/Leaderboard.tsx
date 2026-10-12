@@ -4,6 +4,8 @@ import { GameResult, UserStats } from '../types/game';
 import { TICKET_CONFIGS, MODE_ORDER, PENALTY_BY_ID } from '../data/shop';
 import { soundManager } from '../utils/audio';
 import { PlayerAvatar } from './PlayerAvatar';
+import { NationalBoard } from './NationalBoard';
+import { RANKING_ENABLED } from '../utils/ranking';
 
 interface LeaderboardProps {
   userStats: UserStats;
@@ -92,6 +94,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
           </div>
         </div>
       )}
+
+      {RANKING_ENABLED && <NationalBoard initialMode={lastResult?.mode} />}
 
       {/* USER SUMMARY */}
       <div className="bg-[#201f1f] border-2 border-[#4c4732] rounded-xl p-4 sm:p-5 shadow-xl mb-8 flex flex-col lg:flex-row items-center justify-between gap-5">
@@ -207,7 +211,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
         <div className="bg-[#0e0e0e] border-2 border-[#ffe100] rounded-xl p-4 text-xs font-bold text-[#cec6aa] leading-relaxed">
           <h3 className="font-dela text-sm text-[#ffe100] mb-2">店主からの通達</h3>
           <p>
-            「全国の猛者と競う<span className="text-[#ffe100]">全国完飲番付</span>は準備中だ。まずはこの店で自己ベストを磨いておけ。」
+            {RANKING_ENABLED
+              ? <>「<span className="text-[#ffe100]">全国完飲番付</span>には、遊び終わると自動で名前が載る。ズルは店主が全部見ているぞ。」</>
+              : <>「全国の猛者と競う<span className="text-[#ffe100]">全国完飲番付</span>は準備中だ。まずはこの店で自己ベストを磨いておけ。」</>}
           </p>
         </div>
       </div>

@@ -2,22 +2,12 @@
  * プレイヤー（＝お店に通う常連客）のプロフィール。
  * 店主はゲーム側のキャラクター（写真）で、プレイヤーとは別人。
  */
-export type PlayerAvatar = { kind: 'preset'; id: string } | { kind: 'image'; dataUrl: string };
+import type { PlayerAvatar } from './playerPresets';
+export type { PlayerAvatar } from './playerPresets';
 
-export const AVATAR_PRESETS: { id: string; emoji: string; label: string }[] = [
-  { id: 'ramen', emoji: '🍜', label: 'ラーメン' },
-  { id: 'pig', emoji: '🐷', label: 'ぶた' },
-  { id: 'garlic', emoji: '🧄', label: 'ニンニク' },
-  { id: 'chopsticks', emoji: '🥢', label: '箸' },
-  { id: 'fire', emoji: '🔥', label: '炎' },
-  { id: 'steam', emoji: '♨️', label: '湯気' },
-  { id: 'muscle', emoji: '💪', label: '力こぶ' },
-  { id: 'cool', emoji: '😎', label: 'サングラス' },
-];
+export { AVATAR_PRESETS, DEFAULT_PLAYER_NAME, PLAYER_NAME_MAX } from './playerPresets';
 
-export const DEFAULT_PLAYER_NAME = '名無しの常連客';
 export const DEFAULT_AVATAR: PlayerAvatar = { kind: 'preset', id: 'ramen' };
-export const PLAYER_NAME_MAX = 16;
 
 /** 画像の最大ファイルサイズ（読み込み前のチェック） */
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;

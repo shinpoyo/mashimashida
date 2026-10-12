@@ -1,0 +1,24 @@
+# マシマシ打 全国完飲番付 API（Cloudflare Workers + D1）
+# デプロイは GitHub Actions（.github/workflows/deploy-worker.yml）が行う。
+# database_id はワークフローが自動で埋める（D1 がなければ作る）。
+name = "mashimashi-ranking"
+main = "src/index.ts"
+compatibility_date = "2026-09-20"
+workers_dev = false
+
+routes = [
+  { pattern = "api.shinpoyo.com", custom_domain = true }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mashimashi-ranking"
+database_id = "__D1_DATABASE_ID__"
+migrations_dir = "migrations"
+
+[triggers]
+# 毎日 JST 12:17 に古いセッションなどを掃除
+crons = ["17 3 * * *"]
+
+[vars]
+ALLOWED_ORIGINS = "https://shinpoyo.com,https://shinpoyo.github.io"

@@ -1,0 +1,87 @@
+# 全国完飲番付 API（worker/）を Cloudflare にデプロイする
+# 事前準備（1回だけ）：リポジトリの Settings → Secrets and variables → Actions → Secrets に
+#   CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID（必須）、RANKING_ADMIN_TOKEN / RANKING_IP_SALT（推奨）
+# を登録する。CLOUDFLARE_API_TOKEN がなければ何もせずに終わる。詳しくは docs/ranking.md
+name: Deploy ranking API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'worker/**'
+      - 'src/engine/**'
+      - 'src/data/shop.ts'
+      - 'src/data/playerPresets.ts'
+      - 'src/types/game.ts'
+      - '.github/workflows/deploy-worker.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ranking-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - name: 設定の確認
+        id: check
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID が未設定のため、デプロイしません（docs/ranking.md 参照）"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: oven-sh/setup-bun@v2
+        if: steps.check.outputs.ready == 'true'
+        with:
+          bun-version: 1.4.2
+      - if: steps.check.outputs.ready == 'true'
+        run: bun install --frozen-lockfile
+      - if: steps.check.outputs.ready == 'true'
+        run: bunx tsc --noEmit -p .
+      - name: D1 データベースを用意（なければ作る）
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          find_id() { bunx wrangler d1 list --json | jq -r '.[] | select(.name=="mashimashi-ranking") | .uuid'; }
+          ID="$(find_id)"
+          if [ -z "$ID" ]; then
+            bunx wrangler d1 create mashimashi-ranking
+            ID="$(find_id)"
+          fi
+          test -n "$ID"
+          sed -i "s/__D1_DATABASE_ID__/$ID/" wrangler.toml
+      - name: テーブルの作成・更新
+        if: steps.check.outputs.ready == 'true'
+        run: bunx wrangler d1 migrations apply mashimashi-ranking --remote
+      - name: デプロイ
+        if: steps.check.outputs.ready == 'true'
+        run: bunx wrangler deploy
+      - name: 合言葉（管理用）と IP の塩を登録
+        if: steps.check.outputs.ready == 'true'
+        env:
+          RANKING_ADMIN_TOKEN: ${{ secrets.RANKING_ADMIN_TOKEN }}
+          RANKING_IP_SALT: ${{ secrets.RANKING_IP_SALT }}
+        run: |
+          if [ -n "$RANKING_ADMIN_TOKEN" ]; then printf '%s' "$RANKING_ADMIN_TOKEN" | bunx wrangler secret put ADMIN_TOKEN; fi
+          if [ -n "$RANKING_IP_SALT" ]; then printf '%s' "$RANKING_IP_SALT" | bunx wrangler secret put IP_SALT; fi
+      - name: 動作確認
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS https://api.shinpoyo.com/ ; then exit 0; fi
+            sleep 10
+          done
+          echo "api.shinpoyo.com にまだつながりません（初回は DNS・証明書の反映に数分かかることがあります）"
