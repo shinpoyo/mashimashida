@@ -5,6 +5,10 @@ import { TICKET_CONFIGS, PENALTY_BY_ID } from '../data/shop';
 import { MODES, makeCalls, pick, QUESTIONS, DEFAULT_LV, type Call } from '../engine/calls';
 import { Typer, MultiTyper, type CallTyper } from '../engine/romaji';
 import { lotScore, judgeRank } from '../engine/scoring';
+import { makeRng, randomSeed } from '../engine/rng';
+import { replayGame, lotLimitMs, type LotLog } from '../engine/replay';
+import { RANKING_ENABLED, rankingOptIn, rankingAvatar, requestSession, submitScore, PERIODS, type Period } from '../utils/ranking';
+import type { PlayerAvatar } from '../data/player';
 import { soundManager } from '../utils/audio';
 import { BowlView, ChefPhoto, RamenPhoto, type ChefMood } from './JiroArt';
 import { RuleIntro } from './RuleIntro';
@@ -15,7 +19,15 @@ interface TypingBattleProps {
   onRecord: (result: GameResult) => boolean;
   onShowBoard: () => void;
   onQuit: () => void;
+  /** 全国番付に載せる名前とアイコン（常連カードの設定） */
+  player: { name: string; avatar: PlayerAvatar };
 }
+
+/** 全国番付への登録状況（結果画面に表示） */
+type RankState =
+  | { status: 'off' | 'optout' | 'unranked' | 'gaveup' | 'sending' }
+  | { status: 'done'; positions: Record<Period, number | null> }
+  | { status: 'error'; message: string };
 
 type Phase = 'intro' | 'countdown' | 'play' | 'serve' | 'over';
 
@@ -35,18 +47,24 @@ interface GameState {
   score: number;
   served: number;
   startedAt: number;
+  /** ロットの持ち時間（ミリ秒） */
+  limitMs: number;
+  /** 打鍵の記録（結果の確定と全国番付の検証に使う） */
+  log: LotLog[];
+  /** 全国番付のセッション（サーバーからもらった出題のシード）。なければ番付に載らない */
+  session: { id: string; seed: number } | null;
 }
 
 const VERDICTS = ['CRITICAL GANKO HIT!!', 'MASHIMASHI PERFECT!!', 'SPEED CALL MASTER!!', 'ロット完全維持!!'];
 
-export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, onShowBoard, onQuit }) => {
+export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, onShowBoard, onQuit, player }) => {
   const cfg = MODES[settings.mode];
   const ticket = TICKET_CONFIGS[settings.mode];
   const rule = PENALTY_BY_ID[settings.penalty];
   const scoreMult = rule.scoreRate;
 
-  const newState = (): GameState => ({
-    calls: makeCalls(cfg),
+  const newState = (seed: number = randomSeed()): GameState => ({
+    calls: makeCalls(cfg, makeRng(seed)),
     idx: 0,
     typer: null,
     limit: 0,
@@ -61,6 +79,9 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     score: 0,
     served: 0,
     startedAt: performance.now(),
+    limitMs: 0,
+    log: [],
+    session: null,
   });
 
   const g = useRef<GameState>(newState());
@@ -80,6 +101,9 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const [shake, setShake] = useState<boolean>(false);
   const [imeWarn, setImeWarn] = useState<boolean>(false);
   const [result, setResult] = useState<GameResult | null>(null);
+  const [rankState, setRankState] = useState<RankState>({ status: 'off' });
+  /** start() のたびに増える番号。古い通信の結果を無視するため */
+  const runId = useRef<number>(0);
 
   const phaseRef = useRef<Phase>('intro');
   const pausedRef = useRef<boolean>(false);
@@ -113,6 +137,12 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     (opts: { expelled?: 'breaks' | 'misses'; gaveUp?: boolean } = {}) => {
       clearTimers();
       const s = g.current;
+      // 打鍵の記録から採点をやり直して確定する（サーバーの検証と同じ計算）
+      if (!cfg.super) {
+        const r = replayGame(cfg, rule, s.calls, s.log, { gaveUp: !!opts.gaveUp });
+        Object.assign(s, { score: r.score, keys: r.keys, miss: r.miss, breaks: r.breaks, typingMs: r.typingMs, served: r.served, maxChain: r.maxChain });
+        s.fastest = r.fastestMs ?? Infinity;
+      }
       const { acc, kps, rank, comment } = judgeRank(cfg, { keys: s.keys, miss: s.miss, breaks: s.breaks, typingMs: s.typingMs });
       const res: GameResult = {
         mode: settings.mode,
@@ -143,6 +173,19 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       };
       res.isBest = onRecord(res);
       setResult(res);
+      // 全国番付へ登録（ギブアップは載せない）
+      if (!RANKING_ENABLED || cfg.super) setRankState({ status: 'off' });
+      else if (!rankingOptIn()) setRankState({ status: 'optout' });
+      else if (opts.gaveUp) setRankState({ status: 'gaveup' });
+      else if (!s.session) setRankState({ status: 'unranked' });
+      else {
+        setRankState({ status: 'sending' });
+        const run = runId.current;
+        submitScore({ sessionId: s.session.id, name: player.name, avatar: rankingAvatar(player.avatar), lots: s.log }).then((r) => {
+          if (run !== runId.current) return;
+          setRankState(r.ok ? { status: 'done', positions: r.positions } : { status: 'error', message: r.message });
+        });
+      }
       setPhaseBoth('over');
       if (opts.expelled || opts.gaveUp) {
         say('二度と来るな！', 'stern');
@@ -153,7 +196,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#ffe100', '#c0282d', '#ffffff'] });
       }
     },
-    [cfg, settings, onRecord],
+    [cfg, rule, settings, onRecord, player],
   );
 
   const loop = () => {
@@ -187,7 +230,9 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
       s.limit = cfg.base + cfg.perKey * new Typer(call.kana).rest().length;
     } else {
       s.typer = new Typer(call.kana);
-      s.limit = cfg.base + cfg.perKey * s.typer.rest().length;
+      s.limitMs = lotLimitMs(cfg, call);
+      s.limit = s.limitMs / 1000;
+      s.log.push({ k: '', t: [] });
     }
     say(pick(QUESTIONS), 'normal');
     setCounter('cooking');
@@ -199,16 +244,17 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     loop();
   };
 
-  const endLot = () => {
+  /** ロットを終える。ms はそのロットにかかった時間（記録と同じ値を使い、採点を一致させる） */
+  const endLot = (ms: number) => {
     cancelAnimationFrame(rafId.current);
-    const ms = performance.now() - g.current.lotStart;
     g.current.typingMs += ms;
     return ms;
   };
+  const lotElapsed = () => Math.round(performance.now() - g.current.lotStart);
 
-  const success = () => {
+  const success = (t: number) => {
     const s = g.current;
-    const ms = endLot();
+    const ms = endLot(t);
     setPhaseBoth('serve');
     s.fastest = Math.min(s.fastest, ms);
     s.chain++;
@@ -232,7 +278,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
 
   const timeout = () => {
     const s = g.current;
-    endLot();
+    endLot(cfg.super ? lotElapsed() : s.limitMs);
     setPhaseBoth('serve');
     soundManager.lotBreak();
     setCardState('ng');
@@ -255,10 +301,18 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
   const onKey = (ch: string) => {
     const s = g.current;
     if (!s.typer) return;
+    const t = lotElapsed();
+    if (!cfg.super) {
+      // 持ち時間を過ぎてからの入力は受け付けず、その場でロット乱しにする
+      if (t >= s.limitMs) return timeout();
+      const lot = s.log[s.log.length - 1];
+      lot.k += ch;
+      lot.t.push(t);
+    }
     if (s.typer.input(ch)) {
       s.keys++;
       soundManager.keyStroke();
-      if (s.typer.done) success();
+      if (s.typer.done) success(t);
       else rerender();
       return;
     }
@@ -270,15 +324,19 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
     setVerdict('MISS…店主の眉が動いた');
     rerender();
     if (rule.maxMisses !== null && s.miss >= rule.maxMisses) {
-      endLot();
+      endLot(t);
       finish({ expelled: 'misses' });
     }
   };
 
   const start = () => {
     clearTimers();
+    const run = ++runId.current;
     g.current = newState();
+    // 全国番付のセッションを取りに行く（カウントダウン中に間に合えば、サーバーのシードで出題する）
+    const sessionReq = requestSession(settings.mode, settings.penalty);
     setResult(null);
+    setRankState({ status: 'off' });
     setPaused(false);
     pausedRef.current = false;
     setCounter('cooking');
@@ -296,9 +354,17 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
         n--;
         later(tick, 700);
       } else {
-        setCountdown(0);
-        soundManager.go();
-        nextLot();
+        // 通信が遅いときは最大2秒待ち、それでも来なければ番付なしで始める
+        Promise.race([sessionReq, new Promise<null>((r) => window.setTimeout(() => r(null), 2000))]).then((sess) => {
+          if (run !== runId.current) return;
+          if (sess) {
+            g.current.calls = makeCalls(cfg, makeRng(sess.seed));
+            g.current.session = sess;
+          }
+          setCountdown(0);
+          soundManager.go();
+          nextLot();
+        });
       }
     };
     tick();
@@ -322,7 +388,12 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
 
   const giveUp = () => {
     if (phaseRef.current === 'over') return;
-    if (phaseRef.current === 'play') endLot();
+    if (phaseRef.current === 'play') {
+      const s = g.current;
+      const end = cfg.super ? lotElapsed() : Math.min(lotElapsed(), s.limitMs);
+      if (!cfg.super) s.log[s.log.length - 1].end = end;
+      endLot(end);
+    }
     pausedRef.current = false;
     setPaused(false);
     finish({ gaveUp: true });
@@ -659,6 +730,7 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
               ))}
             </div>
             {result.isBest && <div className="mb-4 py-1.5 bg-[#ffe100] text-[#0e0e0e] font-dela rounded">🏆 自己ベスト更新！</div>}
+            <RankLine state={rankState} name={player.name} />
             <div className="flex flex-col sm:flex-row gap-3">
               <button type="button" onClick={start} className="flex-1 py-3.5 px-4 bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-sm rounded-xl shadow-hard-lg cursor-pointer">
                 もう一杯（Space）
@@ -672,6 +744,34 @@ export const TypingBattle: React.FC<TypingBattleProps> = ({ settings, onRecord, 
             </div>
           </div>
         </div>
+      )}
+    </div>
+  );
+};
+
+/** 結果画面の「全国完飲番付」への登録状況 */
+const RankLine: React.FC<{ state: RankState; name: string }> = ({ state, name }) => {
+  if (state.status === 'off') return null;
+  const text =
+    state.status === 'sending' ? '全国完飲番付に登録中…'
+    : state.status === 'optout' ? '全国完飲番付には参加していません（常連カードで変更できます）'
+    : state.status === 'gaveup' ? 'ギブアップは全国完飲番付に載りません'
+    : state.status === 'unranked' ? '通信できなかったため、今回は全国完飲番付に載りません'
+    : state.status === 'error' ? `全国完飲番付に登録できませんでした：${state.message}`
+    : null;
+  return (
+    <div id="rankLine" className="mb-4 px-3 py-2 rounded-lg bg-[#0e0e0e] border border-[#353534] text-xs font-bold text-[#cec6aa]">
+      {text ?? (
+        state.status === 'done' && (
+          <>
+            <span className="text-[#ffe100]">全国完飲番付</span>（{name}）：
+            {PERIODS.map((p) => (
+              <span key={p.id} className="inline-block mx-1.5">
+                {p.label} <b className="text-[#ffffff] font-mono-code">{state.positions[p.id] ?? '-'}</b>位
+              </span>
+            ))}
+          </>
+        )
       )}
     </div>
   );

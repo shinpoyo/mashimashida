@@ -38,6 +38,8 @@ jobs:
           # 広告（Google AdSense）。リポジトリの Settings → Secrets and variables → Actions → Variables で設定。未設定なら広告なし
           VITE_ADSENSE_CLIENT: ${{ vars.ADSENSE_CLIENT }}
           VITE_ADSENSE_SLOT: ${{ vars.ADSENSE_SLOT }}
+          # 全国完飲番付の API（例：https://api.shinpoyo.com）。Actions の Variables に RANKING_API を設定。未設定なら全国番付なし
+          VITE_RANKING_API: ${{ vars.RANKING_API }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -22,3 +22,8 @@ jobs:
       - run: bun run lint
       - run: bun run test
       - run: bun run build
+      # 全国完飲番付 API（worker/）の型チェック
+      - run: bun install --frozen-lockfile
+        working-directory: worker
+      - run: bunx tsc --noEmit -p .
+        working-directory: worker

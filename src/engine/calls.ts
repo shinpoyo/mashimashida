@@ -2,6 +2,7 @@
  * コール生成ロジック（mashimashityping/js/game.js の TypeScript 移植）
  */
 import type { GameMode } from '../types/game';
+import type { Rng } from './rng';
 
 export type ToppingKey = 'yasai' | 'ninniku' | 'abura' | 'karame';
 
@@ -98,42 +99,42 @@ export const MODES: Record<GameMode, ModeConfig> = {
 
 export const QUESTIONS = ['ニンニク入れますか？', 'ニンニク入れますかぁ？', 'ニンニクは？', 'トッピングは？', 'ニンニク、入れますか？'];
 
-export const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-const randInt = (a: number, b: number) => a + Math.floor(Math.random() * (b - a + 1));
+export const pick = <T,>(arr: T[], rng: Rng = Math.random): T => arr[Math.floor(rng() * arr.length)];
+const randInt = (a: number, b: number, rng: Rng) => a + Math.floor(rng() * (b - a + 1));
 
-function weighted(obj: Record<string, number>): string {
+function weighted(obj: Record<string, number>, rng: Rng): string {
   const entries = Object.entries(obj);
-  let t = Math.random() * entries.reduce((s, [, w]) => s + w, 0);
+  let t = rng() * entries.reduce((s, [, w]) => s + w, 0);
   for (const [k, w] of entries) if ((t -= w) < 0) return k;
   return entries[0][0];
 }
 
-function shuffle<T>(a: T[]): T[] {
+function shuffle<T>(a: T[], rng: Rng): T[] {
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
 
-function makeCall(cfg: ModeConfig): Call {
-  if (cfg.specials && Math.random() < (cfg.specialRate ?? 0)) {
-    const sp = pick(cfg.specials);
+function makeCall(cfg: ModeConfig, rng: Rng): Call {
+  if (cfg.specials && rng() < (cfg.specialRate ?? 0)) {
+    const sp = pick(cfg.specials, rng);
     return { display: sp.display, kana: sp.kana, lv: { ...DEFAULT_LV, ...sp.lv } };
   }
   const [lo, hi] = cfg.count!;
-  const n = randInt(lo, hi);
-  const tops = shuffle(TOPPINGS.slice()).slice(0, n);
+  const n = randInt(lo, hi, rng);
+  const tops = shuffle(TOPPINGS.slice(), rng).slice(0, n);
   if (!cfg.shuffle) {
     // 定番の順序: ヤサイ→ニンニク→アブラ→カラメ（たまにニンニク先頭）
-    const order: ToppingKey[] = Math.random() < 0.3
+    const order: ToppingKey[] = rng() < 0.3
       ? ['ninniku', 'yasai', 'abura', 'karame']
       : ['yasai', 'ninniku', 'abura', 'karame'];
     tops.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   }
   const lv = { ...DEFAULT_LV };
   const words = tops.map((t) => {
-    const mod = weighted(cfg.mods!);
+    const mod = weighted(cfg.mods!, rng);
     lv[t.key] = MOD_LV[mod];
     return t.word + mod;
   });
@@ -198,17 +199,18 @@ export function answersFor(lv: ToppingLevels): { answers: string[]; canonical: s
   return { answers: [...set], canonical };
 }
 
-function makeSuperCall(): Call {
+function makeSuperCall(rng: Rng): Call {
   const lv = { ...DEFAULT_LV };
-  for (const t of TOPPINGS) lv[t.key] = Number(weighted(SUPER_WEIGHTS[t.key]));
+  for (const t of TOPPINGS) lv[t.key] = Number(weighted(SUPER_WEIGHTS[t.key], rng));
   const { answers, canonical } = answersFor(lv);
   return { display: canonical, kana: answers[0], answers, lv };
 }
 
-export function makeCalls(cfg: ModeConfig): Call[] {
+/** 1回分の出題を作る。rng を渡すと、同じ rng（シード）からは必ず同じ出題になる */
+export function makeCalls(cfg: ModeConfig, rng: Rng = Math.random): Call[] {
   const list: Call[] = [];
   while (list.length < cfg.lots) {
-    const c = cfg.super ? makeSuperCall() : makeCall(cfg);
+    const c = cfg.super ? makeSuperCall(rng) : makeCall(cfg, rng);
     if (list.length && list[list.length - 1].kana === c.kana) continue;
     list.push(c);
   }
