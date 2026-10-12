@@ -420,3 +420,9 @@
 - 管理 API で非表示 → 番付から消え、戻すと復活
 - API に接続できないとき：いつもどおり遊べて「今回は載りません」と表示、番付は「読み込めませんでした」
 - 手順は [ranking.md](ranking.md)。Cloudflare の API トークン作成と GitHub への登録はユーザー作業
+
+## 2026-10-12 全国完飲番付の公開
+
+- ユーザーが Cloudflare の API トークンと GitHub の Secrets / Variables を設定し、「Deploy ranking API」を実行 → 成功。`https://api.shinpoyo.com/` が応答
+- 「Deploy to GitHub Pages」を再実行（Claude が実行）→ 公開中のゲームが `https://api.shinpoyo.com` を使うビルドに
+- 本番で確認：CORS（`https://shinpoyo.com` を許可）、開始時のセッション発行（200）、番付の取得（200・まだ0件）、ギブアップは登録されない。本番の番付を汚さないため、登録そのものはローカル環境での確認（同じコード）にとどめた
