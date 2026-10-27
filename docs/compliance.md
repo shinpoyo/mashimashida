@@ -34,7 +34,7 @@
 ## 確認して問題なしとしたもの
 
 - **ライブラリのライセンス**：react / react-dom / vite / tailwindcss / @vitejs/plugin-react（MIT）、canvas-confetti（ISC）、typescript（Apache-2.0）。いずれも商用利用可能。配布時にライセンス表記を同梱すれば足りる
-- **フォント**：Dela Gothic One / M PLUS 1p / JetBrains Mono（SIL Open Font License）、Material Symbols（Apache-2.0）。Web フォントとしての利用に制限なし
+- **フォント**：Dela Gothic One / M PLUS 1p / JetBrains Mono（SIL Open Font License）。アイコンは Material Symbols（Apache-2.0）の SVG を `src/components/Icon.tsx` に同梱（フォントは読み込まない）。Web フォントとしての利用に制限なし
 - **個人情報**：記録は端末の localStorage のみ。サーバー送信・解析タグなし。広告（Google AdSense）を有効にすると広告 Cookie と Google への外部送信が発生する → プライバシーポリシー（https://shinpoyo.com/privacy/）で開示（2026-10-11 追記）
 - **一般名詞・慣用句**：「ヤサイ・ニンニク・アブラ・カラメ」「マシマシ」「ニンニク入れますか？」「ロット」「チョモランマ」はラーメン店で広く使われる言い回しで、特定の権利者の表示には当たらないと判断
 - **SNS 共有**：X（旧 Twitter）の共有用 URL（intent）を開くだけで、API や認証は使っていない

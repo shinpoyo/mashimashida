@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Icon } from './Icon';
 import { ChefPhoto } from './JiroArt';
 
 export interface RuleRow {
@@ -71,7 +72,7 @@ export const RuleIntro: React.FC<RuleIntroProps> = ({ eyebrow, title, chefLine, 
           onClick={onStart}
           className="flex-1 py-3 px-6 rounded-xl bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-lg tracking-wider shadow-hard-lg active:translate-y-1 transition-all flex items-center justify-center gap-3 cursor-pointer"
         >
-          <span className="material-symbols-outlined text-2xl">sports_kabaddi</span>
+          <Icon name="sports_kabaddi" className="text-2xl" />
           {startLabel}（Enter / Space）
         </button>
         <button type="button" onClick={onBack} className="py-3 px-5 rounded-xl bg-[#2a2a2a] hover:bg-[#353534] text-[#cec6aa] font-dela text-sm cursor-pointer">
@@ -83,7 +84,7 @@ export const RuleIntro: React.FC<RuleIntroProps> = ({ eyebrow, title, chefLine, 
         {/* 遊び方 */}
         <div className="md:col-span-7 bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-4">
           <h2 className="font-dela text-sm text-[#e5e2e1] mb-3 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#ffe100] text-lg">menu_book</span>
+            <Icon name="menu_book" className="text-[#ffe100] text-lg" />
             遊び方
           </h2>
           <ol className="flex flex-col gap-2">
@@ -102,7 +103,7 @@ export const RuleIntro: React.FC<RuleIntroProps> = ({ eyebrow, title, chefLine, 
         {/* この回の条件 */}
         <div className="md:col-span-5 bg-[#0e0e0e] border-2 border-[#353534] rounded-xl p-4">
           <h2 className="font-dela text-sm text-[#e5e2e1] mb-1 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#ffb3ae] text-lg">gavel</span>
+            <Icon name="gavel" className="text-[#ffb3ae] text-lg" />
             今回の条件
           </h2>
           <dl className="flex flex-col divide-y divide-[#2a2a2a]">

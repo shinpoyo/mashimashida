@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Icon } from './Icon';
 import { ScreenType } from '../types/game';
 import { soundManager } from '../utils/audio';
 import { PlayerAvatar } from './PlayerAvatar';
@@ -49,9 +50,9 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
       <div className="bg-[#ffe100] text-[#0e0e0e] py-1 px-4 border-b-2 border-[#0e0e0e]">
         <div className="max-w-[920px] mx-auto flex items-center justify-between text-xs font-bold font-mplus">
           <span className="flex items-center gap-1.5 font-dela text-xs tracking-wider uppercase">
-            <span className="material-symbols-outlined text-sm font-bold animate-pulse">warning</span>
+            <Icon name="warning" className="text-sm font-bold animate-pulse" />
             ロット乱し厳禁 ・ 私語厳禁
-            <span className="material-symbols-outlined text-sm font-bold animate-pulse">warning</span>
+            <Icon name="warning" className="text-sm font-bold animate-pulse" />
           </span>
           <div className="flex items-center gap-4">
             <span className="hidden sm:inline-block text-[10px] bg-[#0e0e0e] text-[#ffe100] px-2 py-0.5 rounded font-dela tracking-wider">
@@ -121,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
         <div className="flex items-center gap-3 shrink-0">
           {/* Bowl Counter */}
           <div className="hidden sm:flex items-center gap-2 bg-[#2a2a2a] border-2 border-[#353534] px-2.5 py-1 rounded shadow-inner">
-            <span className="material-symbols-outlined text-[#ffe100] text-lg">ramen_dining</span>
+            <Icon name="ramen_dining" className="text-[#ffe100] text-lg" />
             <div className="flex flex-col leading-none">
               <span className="text-[9px] text-[#cec6aa] font-bold">通算完飲</span>
               <span className="font-mono-code text-sm font-bold text-[#ffe100]">
@@ -140,9 +141,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
               type="button"
               onClick={handleToggleSound}
             >
-              <span className="material-symbols-outlined text-lg">
-                {isMuted ? 'volume_off' : 'volume_up'}
-              </span>
+              <Icon name={isMuted ? 'volume_off' : 'volume_up'} className="text-lg" />
             </button>
             <button
               aria-label="Fullscreen Toggle"
@@ -151,9 +150,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate, bowls
               type="button"
               onClick={handleToggleFullscreen}
             >
-              <span className="material-symbols-outlined text-lg">
-                {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
-              </span>
+              <Icon name={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} className="text-lg" />
             </button>
           </div>
 
