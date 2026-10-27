@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Icon } from './Icon';
 import { AdSlot } from './AdSlot';
 import { GameMode, GameSettings, PenaltyId, UserStats } from '../types/game';
 import { TICKET_CONFIGS, PENALTY_RULES, PENALTY_BY_ID, MODE_ORDER } from '../data/shop';
@@ -64,8 +65,24 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedMode, penalty, active]);
 
+  // スマホ・タブレット（画面を指で触る端末）では、キーボードがないので打てない
+  const [noKeyboard] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches,
+  );
+
   return (
     <div className="flex flex-col w-full pb-16">
+      {noKeyboard && (
+        <div
+          role="note"
+          className="mb-3 rounded-xl border-2 border-[#ffb3ae] bg-[#2a1a19] p-3 text-sm font-bold text-[#ffd9d6] leading-relaxed"
+        >
+          このゲームはキーボードで遊びます。スマホやタブレットでは打てないので、パソコンで開いてください。
+          スマホで遊べる作品は
+          <a className="underline text-[#ffe100] mx-1" href="https://shinpoyo.com/works/">作品一覧</a>
+          にあります。
+        </div>
+      )}
       {/* 開始バー：画面を開いてすぐ見える位置に置く */}
       <div
         id="startBar"
@@ -89,7 +106,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
           id="startBtn"
           className="group shrink-0 py-3.5 px-6 rounded-xl bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-lg tracking-wider transition-all duration-150 shadow-hard-lg active:translate-y-1 flex items-center justify-center gap-3 cursor-pointer"
         >
-          <span className="material-symbols-outlined text-2xl group-hover:animate-bounce">sports_kabaddi</span>
+          <Icon name="sports_kabaddi" className="text-2xl group-hover:animate-bounce" />
           <span>着席して修行開始（Enter）</span>
         </button>
       </div>
@@ -99,7 +116,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
         <div className="lg:col-span-7 flex flex-col gap-5 bg-[#1c1b1b] rounded-xl p-4 sm:p-5 shadow-xl border-2 border-[#353534] relative overflow-hidden">
           <div className="bg-[#353534] rounded-lg p-3 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#ffe100] text-2xl">confirmation_number</span>
+              <Icon name="confirmation_number" className="text-[#ffe100] text-2xl" />
               <div className="flex flex-col">
                 <span className="font-dela text-base text-[#ffffff] tracking-wide">食券売機</span>
                 <span className="font-mono-code text-[10px] text-[#cec6aa] tracking-widest font-bold">AUTOMATIC TICKET VENDING SYSTEM</span>
@@ -158,7 +175,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
           <div className="bg-[#0e0e0e] rounded-lg p-3 shadow-inner flex items-center justify-between border border-[#353534]">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded bg-[#201f1f] flex items-center justify-center text-[#ffe100] shadow-sm">
-                <span className="material-symbols-outlined">receipt_long</span>
+                <Icon name="receipt_long" />
               </div>
               <div>
                 <div className="font-dela text-xs text-[#e5e2e1]">発券トレイ</div>
@@ -190,7 +207,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
               <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-90 pointer-events-none" />
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-[#0e0e0e]/90 backdrop-blur-sm p-2.5 rounded-lg border border-[#353534]">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#ffb3ae] text-lg">psychology_alt</span>
+                  <Icon name="psychology_alt" className="text-[#ffb3ae] text-lg" />
                   <span className="text-xs font-dela text-[#e5e2e1]">
                     店主の目線: <span className="text-[#ffe100]">{currentConfig.chefNote}</span>
                   </span>
@@ -216,7 +233,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
             {/* Exit Penalty Selector */}
             <div className="flex flex-col gap-2 pt-2">
               <span className="text-xs font-bold text-[#cec6aa] uppercase tracking-wider flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm text-[#ffb3ae]">gavel</span>
+                <Icon name="gavel" className="text-sm text-[#ffb3ae]" />
                 退店ペナルティ（店主の厳しさ）
               </span>
               <div className="grid grid-cols-2 gap-2">
@@ -251,7 +268,7 @@ export const TicketVending: React.FC<TicketVendingProps> = ({ initialSettings, b
           {/* Glossary */}
           <details className="bg-[#0e0e0e] rounded-xl p-4 shadow-md border border-[#353534] text-xs font-bold group">
             <summary className="font-dela text-[#e5e2e1] cursor-pointer flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#ffe100]">menu_book</span>
+              <Icon name="menu_book" className="text-[#ffe100]" />
               コール用語集
             </summary>
             <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 mt-3 text-[#cec6aa]">

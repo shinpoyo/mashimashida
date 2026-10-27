@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Icon } from './Icon';
 import { RANKING_ENABLED, rankingOptIn, setRankingOptIn } from '../utils/ranking';
 import { AdSlot } from './AdSlot';
 import { UserStats, ScreenType } from '../types/game';
@@ -105,7 +106,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
               }}
               className="py-2.5 px-4 bg-[#2a2a2a] hover:bg-[#353534] text-[#e5e2e1] font-dela text-xs rounded-xl cursor-pointer flex items-center gap-1.5 border border-[#353534]"
             >
-              <span className="material-symbols-outlined text-sm">edit</span>
+              <Icon name="edit" className="text-sm" />
               {editingProfile ? '編集を閉じる' : '名前・アイコンを変える'}
             </button>
             <button
@@ -113,7 +114,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
               onClick={handleCopyProfile}
               className="py-2.5 px-4 bg-[#2a2a2a] hover:bg-[#353534] text-[#e5e2e1] font-dela text-xs rounded-xl cursor-pointer flex items-center gap-1.5 border border-[#353534]"
             >
-              <span className="material-symbols-outlined text-sm">{copied ? 'done' : 'content_copy'}</span>
+              <Icon name={copied ? 'done' : 'content_copy'} className="text-sm" />
               {copied ? 'コピーしました' : '戦績をコピー'}
             </button>
             <button
@@ -121,7 +122,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
               onClick={() => onNavigate('ticket-vending')}
               className="py-2.5 px-5 bg-[#ffe100] hover:bg-[#ffe330] text-[#0e0e0e] font-dela text-xs rounded-xl shadow-hard-sm cursor-pointer flex items-center gap-1.5"
             >
-              <span className="material-symbols-outlined text-sm">confirmation_number</span>
+              <Icon name="confirmation_number" className="text-sm" />
               食券を買いに行く
             </button>
           </div>
@@ -191,7 +192,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
               </div>
               <div className="mt-3 flex items-center gap-2 flex-wrap">
                 <label className="py-2 px-3 bg-[#2a2a2a] hover:bg-[#353534] text-[#e5e2e1] font-dela text-xs rounded-lg cursor-pointer border border-[#353534] inline-flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm">upload</span>
+                  <Icon name="upload" className="text-sm" />
                   画像をアップロード
                   <input id="avatarUpload" type="file" accept="image/*" className="sr-only" onChange={handleUpload} />
                 </label>
@@ -245,7 +246,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
       <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-5 shadow-xl mb-6">
         <div className="flex items-center justify-between pb-3 border-b border-[#353534] mb-3">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#ffe100]">restaurant</span>
+            <Icon name="restaurant" className="text-[#ffe100]" />
             <h2 className="font-dela text-base sm:text-lg text-[#ffffff]">
               マイ・デフォルトコール（魂の呪文）
             </h2>
@@ -294,7 +295,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
       <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-5 shadow-xl mb-6">
         <div className="flex items-center justify-between pb-3 border-b border-[#353534] mb-4">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#ffe100]">military_tech</span>
+            <Icon name="military_tech" className="text-[#ffe100]" />
             <h2 className="font-dela text-base sm:text-lg text-[#ffffff]">
               獲得称号・トロフィー名鑑
             </h2>
@@ -319,7 +320,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
                   badge.unlocked ? 'bg-[#ffe100] text-[#0e0e0e]' : 'bg-[#2a2a2a] text-[#4c4732]'
                 }`}
               >
-                <span className="material-symbols-outlined">{badge.icon}</span>
+                <Icon name={badge.icon} />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -345,7 +346,7 @@ export const RegularCard: React.FC<RegularCardProps> = ({ userStats, onNavigate,
       <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-5 shadow-xl">
         <div className="flex items-center justify-between pb-3 border-b border-[#353534] mb-3">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#ffe100]">history</span>
+            <Icon name="history" className="text-[#ffe100]" />
             <h2 className="font-dela text-base sm:text-lg text-[#ffffff]">
               直近の完飲修行履歴
             </h2>

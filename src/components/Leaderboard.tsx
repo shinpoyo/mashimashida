@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from './Icon';
 import { AdSlot } from './AdSlot';
 import { GameResult, UserStats } from '../types/game';
 import { TICKET_CONFIGS, MODE_ORDER, PENALTY_BY_ID } from '../data/shop';
@@ -34,7 +35,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
       {/* Top Banner */}
       <div className="bg-[#1c1b1b] border-2 border-[#353534] rounded-xl p-5 shadow-xl mb-6 flex items-center gap-4">
         <div className="w-14 h-14 rounded-full bg-[#ffe100] text-[#0e0e0e] flex flex-col items-center justify-center font-dela shadow-hard-sm shrink-0">
-          <span className="material-symbols-outlined text-xl">military_tech</span>
+          <Icon name="military_tech" className="text-xl" />
           <span className="text-[9px] font-mono-code font-bold">EST.2024</span>
         </div>
         <div>
@@ -128,7 +129,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ userStats, lastResult,
       {/* BEST PER TICKET */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-dela text-lg text-[#e5e2e1] flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#ffe100]">workspace_premium</span>
+          <Icon name="workspace_premium" className="text-[#ffe100]" />
           食券別・自己ベスト番付
         </h2>
         <span className="text-xs font-mono-code text-[#cec6aa] font-bold">PERSONAL BEST</span>
