@@ -114,3 +114,10 @@ cd .. && VITE_RANKING_API=http://localhost:8787 bun run dev
 
 - テスト：`bun test tests/`（出題の再現・採点の再生・不正検査・期間の区切り・名前チェック）
 - `worker/wrangler.toml` の `database_id` はデプロイ時にワークフローが埋める（リポジトリには入れない）
+
+## おまけ：shinpoyo.com の作品カウンター
+
+同じ Worker に、shinpoyo.com の作品一覧を並べ替えるためのカウンターがある（2026-11-22）。
+
+- `POST /v1/plays`：「遊ぶ」が押されたときにサイトから `navigator.sendBeacon` で送られる。1日・1作品・1人につき1回
+- `GET /v1/plays?days=30`：直近30日の作品ごとの回数。shinpoyo.github.io の GitHub Actions が毎日読んで、作品一覧の並びを決める
