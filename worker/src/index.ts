@@ -6,6 +6,8 @@
  *   GET  /v1/rankings           番付（mode × period）
  *   GET  /v1/admin/recent       管理：最近の登録（要 ADMIN_TOKEN）
  *   POST /v1/admin/hide         管理：プレイヤーを番付から隠す／戻す（要 ADMIN_TOKEN）
+ *   POST /v1/plays              shinpoyo.com：作品の「遊ぶ」を1回数える（1日・1作品・1人につき1回）
+ *   GET  /v1/plays?days=30      shinpoyo.com：作品ごとの遊ばれた回数（直近 n 日）
  *
  * ゲームと同じ出題・判定・採点のコード（../../src/engine）をそのまま使う。
  */
@@ -36,14 +38,22 @@ const SESSION_LIMIT = { count: 60, windowMs: 10 * 60 * 1000 };
 const SCORE_LIMIT = { count: 30, windowMs: 10 * 60 * 1000 };
 const MAX_BODY = 64 * 1024;
 const TOP_N = 50;
+/** 作品の ID（shinpoyo.com の works/<id>/ と同じ） */
+const GAME_ID = /^[a-z0-9-]{1,40}$/;
+const PLAY_LIMIT = { count: 60, windowMs: 10 * 60 * 1000 };
+/** 数えた記録を残す日数（これより古い日は毎日の掃除で消す） */
+const PLAYS_KEEP_DAYS = 90;
 
 // ---------- 小道具 ----------
 
+function allowedOrigin(req: Request, env: Env): boolean {
+  const origin = req.headers.get('origin') || '';
+  return env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()).includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
+}
+
 function corsHeaders(req: Request, env: Env): Record<string, string> {
   const origin = req.headers.get('origin') || '';
-  const allowed = env.ALLOWED_ORIGINS.split(',').map((s) => s.trim());
-  const ok = allowed.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
-  return ok
+  return allowedOrigin(req, env)
     ? { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'GET,POST,OPTIONS', 'access-control-allow-headers': 'content-type,authorization', 'access-control-max-age': '86400', vary: 'origin' }
     : { vary: 'origin' };
 }
@@ -291,6 +301,38 @@ async function rankings(req: Request, env: Env, ctx: ExecutionContext): Promise<
   return res;
 }
 
+// ---------- shinpoyo.com の作品カウンター ----------
+
+/** navigator.sendBeacon から送られる（content-type は text/plain）。中身は {"game":"keshikasu"} */
+async function countPlay(req: Request, env: Env): Promise<Response> {
+  // ほかのサイトから数を水増しされないよう、shinpoyo.com からの送信だけを受け付ける
+  if (!allowedOrigin(req, env)) throw new HttpError(403, 'origin', '送信元が正しくありません');
+  const body = await readJson(req);
+  const game = String(body?.game || '');
+  if (!GAME_ID.test(game)) throw new HttpError(400, 'bad_game', '作品の指定が正しくありません');
+  const now = Date.now();
+  const ip = await ipHash(req, env);
+  await rateLimit(env, `g:${ip}`, PLAY_LIMIT, now);
+  await env.DB.prepare('INSERT OR IGNORE INTO plays (game, day, ip_hash) VALUES (?, ?, ?)').bind(game, periodKeys(now).day, ip).run();
+  return json({ ok: true });
+}
+
+/** 直近 days 日（日本時間、今日を含む）の作品ごとの回数 */
+async function playCounts(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  const days = Math.min(PLAYS_KEEP_DAYS, Math.max(1, Number(new URL(req.url).searchParams.get('days')) || 30));
+  const cacheKey = new Request(`https://cache.internal/plays?days=${days}`);
+  const hit = await caches.default.match(cacheKey);
+  if (hit) return new Response(hit.body, hit);
+  const now = Date.now();
+  const from = periodKeys(now - (days - 1) * 86400 * 1000).day;
+  const { results } = await env.DB.prepare('SELECT game, COUNT(*) AS plays FROM plays WHERE day >= ? GROUP BY game ORDER BY plays DESC, game ASC')
+    .bind(from)
+    .all<{ game: string; plays: number }>();
+  const res = json({ days, from, to: periodKeys(now).day, games: results }, 200, { 'cache-control': 'public, max-age=600' });
+  ctx.waitUntil(caches.default.put(cacheKey, res.clone()));
+  return res;
+}
+
 function requireAdmin(req: Request, env: Env) {
   const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
   if (!env.ADMIN_TOKEN || !token || !timingSafeEqual(token, env.ADMIN_TOKEN)) throw new HttpError(401, 'unauthorized', '管理用の合言葉が違います');
@@ -327,6 +369,8 @@ export default {
       else if (req.method === 'GET' && pathname === '/v1/rankings') res = await rankings(req, env, ctx);
       else if (req.method === 'GET' && pathname === '/v1/admin/recent') res = await adminRecent(req, env);
       else if (req.method === 'POST' && pathname === '/v1/admin/hide') res = await adminHide(req, env);
+      else if (req.method === 'POST' && pathname === '/v1/plays') res = await countPlay(req, env);
+      else if (req.method === 'GET' && pathname === '/v1/plays') res = await playCounts(req, env, ctx);
       else if (req.method === 'GET' && pathname === '/') res = json({ name: 'mashimashi-ranking', ok: true });
       else res = fail('not_found', 'ページがありません', 404);
     } catch (e) {
@@ -346,6 +390,7 @@ export default {
     await env.DB.batch([
       env.DB.prepare('DELETE FROM sessions WHERE created_at < ?').bind(now - 24 * 3600 * 1000),
       env.DB.prepare('DELETE FROM rate WHERE reset_at < ?').bind(now),
+      env.DB.prepare('DELETE FROM plays WHERE day < ?').bind(periodKeys(now - PLAYS_KEEP_DAYS * 86400 * 1000).day),
     ]);
   },
 };
